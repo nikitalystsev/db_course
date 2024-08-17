@@ -75,7 +75,7 @@
 	\begin{itemize}
 		\item type -- тип акции;
 		\item description -- описание акции;
-		\item discount\_size -- размер скидки;
+		\item discount\_size -- размер скидки в процентах;
 		\item start\_date -- дата начала акции;
 		\item end\_date -- дата конца акции.
 	\end{itemize}
@@ -112,10 +112,21 @@
 		\item fio\_representative -- ФИО представителя.
 	\end{itemize}
 	
+	\item \textbf{SaleProduct} -- представляет объект продажи товара. Содержит следующие поля: 
+	\begin{itemize}
+		\item shop\_id -- идентификатор магазина, продающего товар;
+		\item product\_id -- идентификатор продаваемого товара;
+		\item price\_id -- идентификатор цены на товар;
+		\item promotion\_id -- идентификатор применяемой к товару акции (если она есть);
+		\item rating -- средний рейтинг товара в магазине.
+	\end{itemize}
+	
 \end{enumerate}
 
 \subsection{Ограничения целостности}
 
+В таблицах \ref{tbl:entity_user} -- ... приведены ограничения целостности для каждой основной таблицы разрабатываемой БД.
+ 
 \begin{table}[ht]
 	\begin{center}
 		\begin{threeparttable}
@@ -125,19 +136,230 @@
 				\hline 
 				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
 				\hline
-				fio & строка & Данное поле не должно быть пустым  \\
+				fio & строка & Не должно быть пустым  \\
 				\hline
-				phone\_number & строка & Данное поле не должно быть пустым, должно быть уникальным  \\
+				phone\_number & строка & Не должно быть пустым, должно быть уникальным  \\
 				\hline
-				password & строка & Данное поле не должно быть пустым  \\
+				password & строка & Не должно быть пустым  \\
 				\hline
-				registration\_date & дата & Данное поле не должно быть пустым  \\
+				registration\_date & дата & Не должно быть пустым  \\
 				\hline
 			\end{tabular}
 		\end{threeparttable}			
 	\end{center}
 \end{table}
 
+\begin{table}[ht]
+	\begin{center}
+		\begin{threeparttable}
+			\caption{Ограничения целостности таблицы Shop}
+			\label{tbl:entity_shop}
+			\begin{tabular}{|p{4cm}|p{2.5cm}|p{8.5cm}|}
+				\hline 
+				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				retailer\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Retailer   \\
+				\hline
+				title & строка & Не должно быть пустым \\
+				\hline
+				address & строка & Не должно быть пустым, должно быть уникальным  \\
+				\hline
+				phone\_number & строка & Не должно быть пустым  \\
+				\hline
+				fio\_director & строка & Не должно быть пустым  \\
+				\hline
+			\end{tabular}
+		\end{threeparttable}			
+	\end{center}
+\end{table}
+
+\begin{table}[ht]
+	\begin{center}
+		\begin{threeparttable}
+			\caption{Ограничения целостности таблицы Price}
+			\label{tbl:entity_price}
+			\begin{tabular}{|p{4cm}|p{2.5cm}|p{8.5cm}|}
+				\hline 
+				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				price & число & Не должно быть пустым. Не должно быть меньше 0  \\
+				\hline
+				currency & строка & Не должно быть пустым  \\
+				\hline
+				setting\_date & дата & Не должно быть пустым  \\
+				\hline
+			\end{tabular}
+		\end{threeparttable}			
+	\end{center}
+\end{table}
+
+\clearpage
+
+\begin{table}[ht]
+	\begin{center}
+		\begin{threeparttable}
+			\caption{Ограничения целостности таблицы Rating}
+			\label{tbl:entity_rating}
+			\begin{tabular}{|p{4cm}|p{2.5cm}|p{8.5cm}|}
+				\hline 
+				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				user\_id & UUID & Не должно быть пустым. Внешний ключ на запись в User  \\
+				\hline
+				sale\_product\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблицу SaleProduct  \\
+				\hline
+				review & строка & Не должно быть пустым \\
+				\hline
+				rating & число & Не должно быть пустым. Не может быть меньше 0 и больше 5 \\
+				\hline
+			\end{tabular}
+		\end{threeparttable}			
+	\end{center}
+\end{table}
+
+\begin{table}[ht]
+	\begin{center}
+		\begin{threeparttable}
+			\caption{Ограничения целостности таблицы Promotion}
+			\label{tbl:entity_promotion}
+			\begin{tabular}{|p{4cm}|p{2.5cm}|p{8.5cm}|}
+				\hline 
+				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				type & строка & Не должно быть пустым  \\
+				\hline
+				description & строка & Не должно быть пустым  \\
+				\hline
+				discount\_size & чисто & Не должно быть пустым. Не должно быть больше не должно быть меньше 0 и больше 100 \\
+				\hline
+				start\_date & дата & Не должно быть пустым \\
+				\hline
+				end\_date & дата & Не должно быть пустым \\
+				\hline
+			\end{tabular}
+		\end{threeparttable}			
+	\end{center}
+\end{table}
+
+В таблице Promotion для полей start\_date и end\_date также определено следующее ограничение: $ end\_date < end\_date $.
+
+\begin{table}[!h]
+	\begin{center}
+		\begin{threeparttable}
+			\caption{Ограничения целостности таблицы Certificate\_compliance}
+			\label{tbl:entity_сertificate_compliance}
+			\begin{tabular}{|p{4cm}|p{2.5cm}|p{8.5cm}|}
+				\hline 
+				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				product\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Product  \\
+				\hline
+				type & строка & Не должно быть пустым  \\
+				\hline
+				number & строка & Не должно быть пустым  \\
+				\hline
+				normative\_document & строка & Не должно быть пустым  \\
+				\hline
+				status\_compliance & boolean & Не должно быть пустым  \\
+				\hline
+				registration\_data & дата & Не должно быть пустым  \\
+				\hline
+				expiration\_date & дата & Не должно быть пустым  \\
+				\hline
+			\end{tabular}
+		\end{threeparttable}			
+	\end{center}
+\end{table}
+
+В таблице Certificate\_compliance для полей registration\_data и expiration\_date также определено следующее ограничение: $ registration\_data < expiration\_date $.
+
+
+Для таблиц Retailer, Distributor, Manufacturer определены следующие ограничения полей: 
+
+\begin{table}[ht]
+	\begin{center}
+		\begin{threeparttable}
+			\caption{Ограничения целостности таблиц Retailer, Distributor и Manufacturer}
+			\label{tbl:entity_rdm}
+			\begin{tabular}{|p{4cm}|p{2.5cm}|p{8.5cm}|}
+				\hline 
+				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				title & строка & Не должно быть пустым   \\
+				\hline
+				address & строка & Не должно быть пустым. Должно быть уникальным.  \\
+				\hline
+				phone\_number & строка & Не должно быть пустым. Должно быть уникальным. \\
+				\hline
+				fio\_representative & строка & Не должно быть пустым. Должно быть уникальным \\
+				\hline
+			\end{tabular}
+		\end{threeparttable}			
+	\end{center}
+\end{table}
+
+\begin{table}[ht]
+	\begin{center}
+		\begin{threeparttable}
+			\caption{Ограничения целостности таблицы Product}
+			\label{tbl:entity_product}
+			\begin{tabular}{|p{4cm}|p{2.5cm}|p{8.5cm}|}
+				\hline 
+				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				retailer\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Retailer  \\
+				\hline
+				distributor\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Distributor \\
+				\hline
+				manufacturer\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Manufacturer  \\
+				\hline
+				name & строка & Не должно быть пустым  \\
+				\hline
+				categories & строка & Не должно быть пустым  \\
+				\hline
+				brand & строка & Не должно быть пустым  \\
+				\hline
+				compound & строка & Не должно быть пустым  \\
+				\hline
+				gross\_mass & число & Не должно быть пустым. Не должно быть меньше 0  \\
+				\hline
+				net\_mass & число & Не должно быть пустым. Не должно быть меньше 0  \\
+				\hline
+				package\_type & строка & Не должно быть пустым  \\
+				\hline
+			\end{tabular}
+		\end{threeparttable}			
+	\end{center}
+\end{table}
+
+В таблице Product для полей gross\_mass и net\_mass также определено следующее ограничение: $ gross\_mass \geq net\_mass $.
+
+\clearpage
+\begin{table}[!h]
+	\begin{center}
+		\begin{threeparttable}
+			\caption{Ограничения целостности таблицы SaleProduct}
+			\label{tbl:entity_sale_product}
+			\begin{tabular}{|p{4cm}|p{2.5cm}|p{8.5cm}|}
+				\hline 
+				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				shop\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Shop  \\
+				\hline
+				product\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Product \\
+				\hline
+				price\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Price  \\
+				\hline
+				promotion\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Promotion \\
+				\hline
+				rating & число & Не должно быть пустым. Не может быть меньше 0 и больше 5 \\
+				\hline
+			\end{tabular}
+		\end{threeparttable}			
+	\end{center}
+\end{table}
+
+\clearpage
 
 \subsection{Триггеры базы данных}
 
