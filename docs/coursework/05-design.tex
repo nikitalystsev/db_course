@@ -10,16 +10,134 @@
 
 На рисунке \ref{img:er-entities-diag.drawio} представлена ER-модель разрабатывамой базы данных:
 
-\includesvgimage
+\includeimage
 {er-entities-diag.drawio} % Имя файла без расширения (файл должен быть расположен в директории inc/img/)
 {f} % Обтекание (без обтекания)
 {h} % Положение рисунка (см. figure из пакета float)
 {1\textwidth} % Ширина рисунка
 {ER-модель базы данных} % Подпись рисунка
 
-% описать каждую сущность и ее поля
+\subsection{Описание сущностей}
 
-\clearpage
+В соответствии с диаграммой проектируемой БД были составлены следующие основные сущности:
+
+\begin{enumerate}
+	\item \textbf{User} -- представляет пользователя системы. Содержит следующие поля: 
+	\begin{itemize}
+		\item fio -- ФИО пользователя;
+		\item phone\_number -- номер телефона пользователя;
+		\item password -- поле, хранящее хешированный пароль аккаунта пользователя.
+		\item registration\_date -- дата  регистрации пользователя.
+	\end{itemize}
+	
+	\item \textbf{Shop} -- представляет объект магазина. Содержит следующие поля: 
+	\begin{itemize}
+		\item retailer\_id -- идентификатор ритейлера, с которым работает сотрудничает магазин;
+		\item title -- название магазина;
+		\item address -- адрес магазина;
+		\item phone\_number -- номер телефона магазина;
+		\item fio\_director -- ФИО директора магазина;
+	\end{itemize}
+	
+	\item \textbf{Product} -- представляет объект товара. Содержит следующие поля: 
+	\begin{itemize}
+		\item retailer\_id -- идентификатор ритейлера, который реализует товар;
+		\item distributor\_id -- идентификатор дистрибьютора, который распространяет товар;
+		\item manufacturer\_id -- идентификатор производителя, который производит товар;
+		\item name -- название товара;
+		\item categories -- категория товара;
+		\item brand -- бренд товара;
+		\item compound -- состав товара;
+		\item gross\_mass -- масса брутто;
+		\item net\_mass -- масса нетто;
+		\item package\_type -- тип упаковки.
+	\end{itemize}
+	
+	\item \textbf{Certificate\_compliance} -- представляет объект сертификата соответствия. Содержит следующие поля: 
+	\begin{itemize}
+		\item product\_id -- идентификатор товара, который соответствует данному сертификату;
+		\item type -- тип сертификата;
+		\item number -- номер сертификата;
+		\item normative\_document -- нормативный документ, которому удовлетворяет товар;
+		\item status\_compliance -- статус соответствия;
+		\item registration\_data -- дата регистрации сертификата;
+		\item expiration\_date -- дата окончания действия сертификата.
+	\end{itemize}
+	
+	\item \textbf{Price} -- представляет объект цены товара. Содержит следующие поля: 
+	\begin{itemize}
+		\item price -- цена товара;
+		\item currency -- валюта;
+		\item setting\_date -- дата установки цены.
+	\end{itemize}
+	
+	\item \textbf{Promotion} -- представляет объект акции на товар. Содержит следующие поля: 
+	\begin{itemize}
+		\item type -- тип акции;
+		\item description -- описание акции;
+		\item discount\_size -- размер скидки;
+		\item start\_date -- дата начала акции;
+		\item end\_date -- дата конца акции.
+	\end{itemize}
+	
+	\item \textbf{Rating} -- представляет объект оценки товара. Содержит следующие поля: 
+	\begin{itemize}
+		\item user\_id -- идентификатор пользователя, оставившего отзыв;
+		\item  sale\_product\_id -- идентификатор продажи конкретного товара в конкретном магазине;
+		\item review -- отзыв;
+		\item rating -- рейтинг.
+	\end{itemize}
+	
+	\item \textbf{Manufacturer} -- представляет объект производителя товара. Содержит следующие поля: 
+	\begin{itemize}
+		\item title -- название производителя;
+		\item address -- адрес производителя;
+		\item phone\_number -- номер телефона;
+		\item fio\_representative -- ФИО представителя.
+	\end{itemize}
+	
+	\item \textbf{Distributor} -- представляет объект дистрибьютора товара. Содержит следующие поля: 
+	\begin{itemize}
+		\item title -- название дистрибьютора;
+		\item address -- адрес дистрибьютора;
+		\item phone\_number -- номер телефона;
+		\item fio\_representative -- ФИО представителя.
+	\end{itemize}
+	
+	\item \textbf{Retailer} -- представляет объект ритейлера товара. Содержит следующие поля: 
+	\begin{itemize}
+		\item title -- название ритейлера;
+		\item address -- адрес ритейлера;
+		\item phone\_number -- номер телефона;
+		\item fio\_representative -- ФИО представителя.
+	\end{itemize}
+	
+\end{enumerate}
+
+\subsection{Ограничения целостности}
+
+\begin{table}[ht]
+	\begin{center}
+		\begin{threeparttable}
+			\caption{Ограничения целостности таблицы User}
+			\label{tbl:entity_user}
+			\begin{tabular}{|p{4cm}|p{2.5cm}|p{8.5cm}|}
+				\hline 
+				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				fio & строка & Данное поле не должно быть пустым  \\
+				\hline
+				phone\_number & строка & Данное поле не должно быть пустым, должно быть уникальным  \\
+				\hline
+				password & строка & Данное поле не должно быть пустым  \\
+				\hline
+				registration\_date & дата & Данное поле не должно быть пустым  \\
+				\hline
+			\end{tabular}
+		\end{threeparttable}			
+	\end{center}
+\end{table}
+
 
 \subsection{Триггеры базы данных}
 
