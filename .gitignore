@@ -3,3 +3,5 @@ docs/coursework/inc/img/scheme_drawio/*.bkp
 src/.idea
 src/.env
 src/internal/.datasets
+.idea
+src/.data
