@@ -1,1 +1,1 @@
-drop database if exists smartshopper;
+drop database if exists smartshopper with (force);
