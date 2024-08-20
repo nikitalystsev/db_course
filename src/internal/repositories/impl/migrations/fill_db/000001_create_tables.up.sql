@@ -49,8 +49,8 @@ create table if not exists ss.product
     categories      text,
     brand           text,
     compound        text,
-    gross_mass      int,
-    net_mass        int,
+    gross_mass      numeric,
+    net_mass        numeric,
     package_type    text,
     foreign key (retailer_id) references retailer (id) on delete cascade on update cascade,
     foreign key (distributor_id) references distributor (id) on delete cascade on update cascade,
@@ -82,7 +82,7 @@ create table if not exists ss.user
 create table if not exists ss.price
 (
     id           uuid primary key default uuid_generate_v4(),
-    price        int,
+    price        numeric,
     currency     text,
     setting_date date
 );
@@ -92,7 +92,7 @@ create table if not exists ss.promotion
     id            uuid primary key default uuid_generate_v4(),
     type          text,
     description   text,
-    discount_size int,
+    discount_size numeric,
     start_date    date,
     end_date      date
 );
@@ -117,7 +117,7 @@ create table if not exists ss.rating
     user_id         uuid,
     sale_product_id uuid,
     review          text,
-    rating          int,
+    rating          numeric,
     foreign key (user_id) references "user" (id) on delete cascade on update cascade,
     foreign key (sale_product_id) references sale_product (id) on delete cascade on update cascade
 );

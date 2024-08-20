@@ -5,3 +5,4 @@ src/.env
 src/internal/.datasets
 .idea
 src/.data
+src/internal/data/scripts/__pycache__

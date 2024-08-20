@@ -125,11 +125,15 @@ class Generator:
         self.price_ids = []
         self.promotion_ids = []
 
+        self.sale_product_ids = []
+
     def retailers_to_csv(self, num: int):
         """
         Метод для генерации ритейлеров
         """
         self.retailer_ids.clear()
+
+        self.faker = Faker("ru_RU")
 
         with open(file=RETAILER_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.DictWriter(file, fieldnames=["id", "name", "address", "phone_number", "fio_representative"])
@@ -140,9 +144,9 @@ class Generator:
                 writer.writerow({
                     "id": retailer_id,
                     "name": self.faker.company(),
-                    "address": self.faker.address().replace("\n", ", "),
-                    "phone_number": self.faker.phone_number(),
-                    "fio_representative": self.faker.name()
+                    "address": self.faker.unique.address().replace("\n", ", "),
+                    "phone_number": self.faker.unique.phone_number(),
+                    "fio_representative": self.faker.unique.name()
                 })
                 self.retailer_ids.append(retailer_id)
 
@@ -151,6 +155,8 @@ class Generator:
         Метод для генерации дистрибьюторов
         """
         self.distributor_ids.clear()
+
+        self.faker = Faker("ru_RU")
 
         with open(file=DISTRIBUTOR_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.DictWriter(file, fieldnames=["id", "name", "address", "phone_number", "fio_representative"])
@@ -161,9 +167,9 @@ class Generator:
                 writer.writerow({
                     "id": distributor_id,
                     "name": self.faker.company(),
-                    "address": self.faker.address().replace("\n", ", "),
-                    "phone_number": self.faker.phone_number(),
-                    "fio_representative": self.faker.name()
+                    "address": self.faker.unique.address().replace("\n", ", "),
+                    "phone_number": self.faker.unique.phone_number(),
+                    "fio_representative": self.faker.unique.name()
                 })
                 self.distributor_ids.append(distributor_id)
 
@@ -172,6 +178,8 @@ class Generator:
         Метод для генерации производителей
         """
         self.manufacturer_ids.clear()
+
+        self.faker = Faker("ru_RU")
 
         with open(file=MANUFACTURER_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.DictWriter(file, fieldnames=["id", "name", "address", "phone_number", "fio_representative"])
@@ -182,9 +190,9 @@ class Generator:
                 writer.writerow({
                     "id": manufacturer_id,
                     "name": self.faker.company(),
-                    "address": self.faker.address().replace("\n", ", "),
-                    "phone_number": self.faker.phone_number(),
-                    "fio_representative": self.faker.name()
+                    "address": self.faker.unique.address().replace("\n", ", "),
+                    "phone_number": self.faker.unique.phone_number(),
+                    "fio_representative": self.faker.unique.name()
                 })
                 self.manufacturer_ids.append(manufacturer_id)
 
@@ -209,20 +217,20 @@ class Generator:
         )
         writer.writeheader()
 
+        self.faker = Faker("ru_RU")
+
         cnt = 1
 
         for row in reader:
             shop_id = str(uuid.uuid4())
             retailer_id = random.choice(self.retailer_ids)
 
-            address = (row['Страна'] + ',' + row['Регион'] + ',' +
-                       row['Населенный Пункт'] + ',' + row['Индекс'] + ',' + row['Адрес'])
             writer.writerow({
                 "id": shop_id,
                 "retailer_id": retailer_id,
                 "title": row['Название'],
-                "address": address,
-                "phone_number": row['Сотовый'] if row['Сотовый'] != "l" else self.faker.phone_number(),
+                "address": self.faker.unique.address(),
+                "phone_number": self.faker.unique.phone_number(),
                 "fio_director": self.faker.name()
             })
             self.shop_retailer_ids.append((shop_id, retailer_id))
@@ -271,6 +279,8 @@ class Generator:
                 product_id = str(uuid.uuid4())
                 retailer_id = random.choice(self.retailer_ids)
                 category = random.choice(PRODUCT_CATEGORIES)
+                masses = self.__get_two_gross_and_net_mass()
+
                 writer.writerow({
                     "id": product_id,
                     "retailer_id": retailer_id,
@@ -280,8 +290,8 @@ class Generator:
                     "categories": category,
                     "brand": f"{brand_faker.word().capitalize()}{brand_faker.word().capitalize()}",
                     "compound": ", ".join([food.spices() for _ in range(random.randint(3, 5))]),
-                    "gross_mass": round(random.uniform(0.3, 5), 2),
-                    "net_mass": round(random.uniform(0.1, 4.9), 2),
+                    "gross_mass": masses[0],
+                    "net_mass": masses[1],
                     "package_type": random.choice(PRODUCT_PACKAGE_TYPES)
                 })
                 self.product_retailer_ids.append((product_id, retailer_id))
@@ -322,8 +332,8 @@ class Generator:
                     "number": self.__get_certificate_number_by_type(certificate_type),
                     "normative_document": random.choice(CERTIFICATE_COMPLIANCE_NORMATIVE_DOCUMENTS),
                     "status_compliance": True,
-                    "registration_data": dates[0],
-                    "expiration_data": dates[1]
+                    "registration_data": dates[1],
+                    "expiration_data": dates[0]
                 })
 
     def prices_to_csv(self, num: int):
@@ -368,8 +378,8 @@ class Generator:
                     "type": promotion_type,
                     "discount_size": self.__get_discount_size_by_promotion_type(promotion_type),
                     "description": self.faker.text(),
-                    "start_date": dates[0],
-                    "end_date": dates[1],
+                    "start_date": dates[1],
+                    "end_date": dates[0],
                 })
                 self.promotion_ids.append(promotion_id)
 
@@ -380,6 +390,8 @@ class Generator:
         if not self.shop_retailer_ids or not self.product_retailer_ids or not self.price_ids or not self.promotion_ids:
             print("Нет либо магазинов, либо товаров, либо цен, либо акций")
             return
+
+        self.sale_product_ids.clear()
 
         unique_pairs = set()
 
@@ -403,7 +415,7 @@ class Generator:
                     "promotion_id": self.__get_random_promotion_id(),
                     "rating": None,
                 })
-                self.promotion_ids.append(sale_product_id)
+                self.sale_product_ids.append(sale_product_id)
 
     def retailer_distributor_to_csv(self, num: int):
         """
@@ -478,6 +490,15 @@ class Generator:
             return food_faker.drink()
 
         return food_faker.dish()
+
+    @staticmethod
+    def __get_two_gross_and_net_mass():
+        # Генерируем первое вещественное число
+        gross_mass = random.uniform(0.3, 10)
+        # Генерируем второе вещественное число, которое будет меньше первого
+        net_mass = random.uniform(0.1, gross_mass)
+
+        return round(gross_mass, 2), round(net_mass, 2)
 
     @staticmethod
     def __get_random_dates():

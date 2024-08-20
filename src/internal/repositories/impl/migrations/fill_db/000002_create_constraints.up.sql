@@ -51,7 +51,7 @@ alter table if exists ss.product
     alter column net_mass set not null,
     alter column package_type set not null,
     add check (gross_mass > 0 and net_mass > 0),
-    add check (net_mass < gross_mass);
+    add check (net_mass <= gross_mass);
 
 alter table if exists ss.certificate_compliance
     alter column id set not null,
@@ -93,15 +93,6 @@ alter table ss.sale_product
     alter column shop_id set not null,
     alter column product_id set not null,
     alter column price_id set not null,
-    alter column promotion_id set not null,
-    add check (rating >= 0 and rating <= 5);
-
-alter table ss.sale_product
-    alter column id set not null,
-    alter column shop_id set not null,
-    alter column product_id set not null,
-    alter column price_id set not null,
-    alter column promotion_id set not null,
     add check (rating >= 0 and rating <= 5),
     add unique (shop_id, product_id);
 
