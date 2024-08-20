@@ -104,6 +104,7 @@ create table if not exists ss.sale_product
     product_id   uuid,
     price_id     uuid,
     promotion_id uuid,
+    rating       float,
     foreign key (shop_id) references shop (id) on delete cascade on update cascade,
     foreign key (product_id) references product (id) on delete cascade on update cascade,
     foreign key (price_id) references price (id) on delete cascade on update cascade,
