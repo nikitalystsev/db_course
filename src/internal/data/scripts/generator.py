@@ -81,6 +81,31 @@ CERTIFICATE_COMPLIANCE_NORMATIVE_DOCUMENTS = [
     'ТР ЕАЭС 040/2016 «О безопасности рыбы и рыбной продукции»'
 ]
 
+PROMOTION_TYPES = [
+    'Товар дня',
+    '1 + 1 = 3',
+    'скидка ',
+    'событие: ',
+    'сезонная распродажа'
+]
+
+BUYER_CATEGORIES = [
+    "Семьям с детьми",
+    "Одиноким взрослым",
+    "Пожилым людям",
+    "Молодым парам",
+    "Студентам"
+]
+
+PROMOTION_EVENTS = [
+    'Новый год',
+    'Рождество',
+    '8 марта',
+    '23 февраля',
+    'День Космонавтики',
+    'День России'
+]
+
 
 class Generator:
     """
@@ -96,6 +121,9 @@ class Generator:
 
         self.shop_retailer_ids = []
         self.product_retailer_ids = []
+
+        self.price_ids = []
+        self.promotion_ids = []
 
     def retailers_to_csv(self, num: int):
         """
@@ -266,7 +294,7 @@ class Generator:
             print("Нет товаров")
             return
 
-        with open(file=PRODUCT_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
+        with open(file=CERTIFICATE_COMPLIANCE_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.DictWriter(
                 file,
                 fieldnames=[
@@ -297,6 +325,53 @@ class Generator:
                     "registration_data": dates[0],
                     "expiration_data": dates[1]
                 })
+
+    def prices_to_csv(self, num: int):
+        """
+        Метод для генерации цен
+        """
+        self.price_ids.clear()
+
+        with open(file=PRICE_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(file, fieldnames=["id", "price", "currency", "setting_date"])
+            writer.writeheader()
+
+            for _ in range(num):
+                price_id = str(uuid.uuid4())
+                writer.writerow({
+                    "id": price_id,
+                    "price": round(random.uniform(100, 5000), 2),
+                    "currency": self.faker.currency_code(),
+                    "setting_date": self.__get_random_date_in_past(),
+                })
+                self.price_ids.append(price_id)
+
+    def promotions_to_csv(self, num: int):
+        """
+        Метод для генерации акций
+        """
+        self.promotion_ids.clear()
+
+        with open(file=PROMOTION_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(
+                file,
+                fieldnames=["id", "type", "description", "discount_size", "start_date", "end_date"]
+            )
+            writer.writeheader()
+
+            for _ in range(num):
+                promotion_id = str(uuid.uuid4())
+                promotion_type = random.choice(PROMOTION_TYPES)
+                dates = self.__get_random_dates()
+                writer.writerow({
+                    "id": promotion_id,
+                    "type": promotion_type,
+                    "discount_size": self.__get_discount_size_by_promotion_type(promotion_type),
+                    "description": self.faker.text(),
+                    "start_date": dates[0],
+                    "end_date": dates[1],
+                })
+                self.promotion_ids.append(promotion_id)
 
     @staticmethod
     def __get_product_name_by_category(category: str, food_faker: Food):
@@ -425,3 +500,29 @@ class Generator:
             return self.__get_sgr_number()
 
         return self.__get_vsd_number()
+
+    @staticmethod
+    def __get_random_date_in_past(years_ago=1):
+        # Получаем текущую дату
+        now = datetime.datetime.now()
+
+        # Вычисляем дату, соответствующую указанному количеству лет назад
+        start_date = now - datetime.timedelta(days=365 * years_ago)
+
+        # Генерируем случайное количество дней между start_date и today
+        random_days = random.randint(0, (now - start_date).days)
+
+        # Генерируем случайную дату
+        random_date = start_date + datetime.timedelta(days=random_days)
+
+        return random_date
+
+    @staticmethod
+    def __get_discount_size_by_promotion_type(promotion_type):
+        """
+        Метод для получения случайного размера скидки по типу акции
+        """
+        if promotion_type == PROMOTION_TYPES[1]:
+            return None
+
+        return random.randint(5, 99)

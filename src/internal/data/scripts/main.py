@@ -14,6 +14,9 @@ def main() -> None:
     generator.manufacturers_to_csv(COUNT_RECORDS)
     generator.shops_to_csv(COUNT_RECORDS)
     generator.products_to_csv(COUNT_RECORDS)
+    generator.certificates_compliance_to_csv(COUNT_RECORDS)
+    generator.prices_to_csv(COUNT_RECORDS)
+    generator.promotions_to_csv(COUNT_RECORDS)
 
 
 if __name__ == '__main__':
