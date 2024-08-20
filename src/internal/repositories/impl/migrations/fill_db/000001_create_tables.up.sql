@@ -5,7 +5,7 @@ create table if not exists ss.retailer
     id                 uuid primary key default uuid_generate_v4(),
     title              text,
     address            text,
-    phone_number       varchar(20),
+    phone_number       varchar(30),
     fio_representative text
 );
 
@@ -14,7 +14,7 @@ create table if not exists ss.distributor
     id                 uuid primary key default uuid_generate_v4(),
     title              text,
     address            text,
-    phone_number       varchar(20),
+    phone_number       varchar(30),
     fio_representative text
 );
 
@@ -23,7 +23,7 @@ create table if not exists ss.manufacturer
     id                 uuid primary key default uuid_generate_v4(),
     title              text,
     address            text,
-    phone_number       varchar(20),
+    phone_number       varchar(30),
     fio_representative text
 );
 
@@ -34,7 +34,7 @@ create table if not exists ss.shop
     retailer_id  uuid,
     title        text,
     address      text,
-    phone_number varchar(20),
+    phone_number varchar(30),
     fio_director text,
     foreign key (retailer_id) references retailer (id) on delete cascade on update cascade
 );
@@ -74,7 +74,7 @@ create table if not exists ss.user
 (
     id                uuid primary key default uuid_generate_v4(),
     fio               text,
-    phone_number      varchar(20),
+    phone_number      varchar(30),
     password          text,
     registration_data date
 );
