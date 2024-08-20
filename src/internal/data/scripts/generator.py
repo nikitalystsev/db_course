@@ -1,8 +1,11 @@
 import csv
+import datetime
 import random
 import uuid
 
 from faker import Faker
+from mimesis import Food
+from mimesis.locales import Locale
 
 RETAILER_DATA_PATH = "../data/retailer.csv"
 DISTRIBUTOR_DATA_PATH = "../data/distributor.csv"
@@ -46,6 +49,13 @@ PRODUCT_CATEGORIES = [
     'масло подсолнечное',
     'молоко питьевое',
     'чай черный байховый'
+]
+
+PRODUCT_PACKAGE_TYPES = [
+    'Пластиковая упаковка',
+    'Картонная коробка',
+    'Стеклянная банка',
+    'Полиэтиленовый пакет'
 ]
 
 
@@ -177,6 +187,10 @@ class Generator:
         """
         Метод для генерации продуктов
         """
+        if not self.retailer_ids or not self.distributor_ids or not self.manufacturer_ids:
+            print("Нет либо ритейлеров, либо дистрибьюторов, либо производителей")
+            return
+
         self.product_retailer_ids.clear()
 
         with open(file=PRODUCT_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
@@ -198,12 +212,92 @@ class Generator:
             )
             writer.writeheader()
 
+            food = Food(locale=Locale.RU)
+
+            brand_faker = Faker()
+
             for _ in range(num):
                 product_id = str(uuid.uuid4())
                 retailer_id = random.choice(self.retailer_ids)
+                category = random.choice(PRODUCT_CATEGORIES)
                 writer.writerow({
                     "id": product_id,
                     "retailer_id": retailer_id,
                     "distributor_id": random.choice(self.distributor_ids),
                     "manufacturer_id": random.choice(self.manufacturer_ids),
+                    "name": self.__get_product_name_by_category(category, food),
+                    "categories": category,
+                    "brand": f"{brand_faker.word().capitalize()}{brand_faker.word().capitalize()}",
+                    "compound": ", ".join([food.spices() for _ in range(random.randint(3, 5))]),
+                    "gross_mass": round(random.uniform(0.3, 5), 2),
+                    "net_mass": round(random.uniform(0.1, 4.9), 2),
+                    "package_type": random.choice(PRODUCT_PACKAGE_TYPES)
                 })
+                self.product_retailer_ids.append((product_id, retailer_id))
+
+    def certificates_compliance_to_csv(self, num: int):
+        """
+        Метод для генерации продуктов
+        """
+        if not self.product_retailer_ids:
+            print("Нет товаров")
+            return
+
+        with open(file=PRODUCT_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(
+                file,
+                fieldnames=[
+                    "id",
+                    "product_id",
+                    "type",
+                    "number",
+                    "normative_document",
+                    "status_compliance",
+                    "registration_data",
+                    "expiration_data"
+                ]
+            )
+            writer.writeheader()
+            for _ in range(num):
+                certificate_compliance_id = str(uuid.uuid4())
+                product_id = random.choice(self.product_retailer_ids)[0]
+                dates = self.__get_random_dates()
+
+                writer.writerow({
+                    "id": certificate_compliance_id,
+                    "product_id": product_id,
+                    "status_compliance": True,
+                    "registration_data": dates[0],
+                    "expiration_data": dates[1]
+                })
+
+    @staticmethod
+    def __get_product_name_by_category(category: str, food_faker: Food):
+        """
+        Метод для генерации имени товара по его категории
+        """
+        if category in PRODUCT_CATEGORIES[14:18]:
+            return food_faker.vegetable()
+
+        if category == PRODUCT_CATEGORIES[18]:
+            return food_faker.fruit()
+
+        if category in PRODUCT_CATEGORIES[19:]:
+            return food_faker.drink()
+
+        return food_faker.dish()
+
+    @staticmethod
+    def __get_random_dates():
+        # Получаем текущую дату и время
+        now = datetime.datetime.now()
+
+        # Генерируем случайное количество дней для первой даты (от 0 до 30)
+        days_delta_1 = random.randint(0, 365)
+        date_1 = now - datetime.timedelta(days=days_delta_1)
+
+        # Генерируем случайное количество дней для второй даты (от 0 до 30, но больше первой)
+        days_delta_2 = random.randint(days_delta_1 + 1, days_delta_1 + 365)
+        date_2 = now - datetime.timedelta(days=days_delta_2)
+
+        return date_1, date_2

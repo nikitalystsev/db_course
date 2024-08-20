@@ -13,6 +13,7 @@ def main() -> None:
     generator.distributors_to_csv(COUNT_RECORDS)
     generator.manufacturers_to_csv(COUNT_RECORDS)
     generator.shops_to_csv(COUNT_RECORDS)
+    generator.products_to_csv(COUNT_RECORDS)
 
 
 if __name__ == '__main__':
