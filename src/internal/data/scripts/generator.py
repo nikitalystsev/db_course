@@ -20,6 +20,34 @@ DISTRIBUTOR_MANUFACTURER_DATA_PATH = "../data/distributor_manufacturer.csv"
 
 PARSE_SHOP_DATA_PATH = "../parse/shops.csv"
 
+PRODUCT_CATEGORIES = [
+    'говядина, баранина, свинина (кроме бескостного мяса)',
+    'куры (кроме куриных окорочков)',
+    'рыба мороженая неразделанная',
+    'масло сливочное',
+    'яйца куриные',
+    'сахар-песок',
+    'соль поваренная пищевая',
+    'мука пшеничная',
+    'хлеб ржаной, ржано-пшеничный',
+    'хлеб и булочные изделия из пшеничной муки',
+    'рис шлифованный',
+    'пшено',
+    'крупа гречневая – ядрица',
+    'вермишель',
+
+    'картофель',
+    'капуста белокочанная свежая',
+    'лук репчатый',
+    'морковь',
+
+    'яблоки'
+
+    'масло подсолнечное',
+    'молоко питьевое',
+    'чай черный байховый'
+]
+
 
 class Generator:
     """
@@ -144,3 +172,38 @@ class Generator:
 
         shop_file.close()
         parse_file.close()
+
+    def products_to_csv(self, num: int):
+        """
+        Метод для генерации продуктов
+        """
+        self.product_retailer_ids.clear()
+
+        with open(file=PRODUCT_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(
+                file,
+                fieldnames=[
+                    "id",
+                    "retailer_id",
+                    "distributor_id",
+                    "manufacturer_id",
+                    "name",
+                    "categories",
+                    "brand",
+                    "compound",
+                    "gross_mass",
+                    "net_mass",
+                    "package_type"
+                ]
+            )
+            writer.writeheader()
+
+            for _ in range(num):
+                product_id = str(uuid.uuid4())
+                retailer_id = random.choice(self.retailer_ids)
+                writer.writerow({
+                    "id": product_id,
+                    "retailer_id": retailer_id,
+                    "distributor_id": random.choice(self.distributor_ids),
+                    "manufacturer_id": random.choice(self.manufacturer_ids),
+                })
