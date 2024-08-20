@@ -361,7 +361,7 @@ class Generator:
 
             for _ in range(num):
                 promotion_id = str(uuid.uuid4())
-                promotion_type = random.choice(PROMOTION_TYPES)
+                promotion_type = self.__get_promotion_type()
                 dates = self.__get_random_dates()
                 writer.writerow({
                     "id": promotion_id,
@@ -372,6 +372,96 @@ class Generator:
                     "end_date": dates[1],
                 })
                 self.promotion_ids.append(promotion_id)
+
+    def sale_products_to_csv(self, num: int):
+        """
+        Метод для генерации продаж товаров
+        """
+        if not self.shop_retailer_ids or not self.product_retailer_ids or not self.price_ids or not self.promotion_ids:
+            print("Нет либо магазинов, либо товаров, либо цен, либо акций")
+            return
+
+        unique_pairs = set()
+
+        while len(unique_pairs) < num:
+            unique_pairs.add(self.__get_random_shop_and_product_by_retailer())
+
+        with open(file=SALE_PRODUCT_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(
+                file,
+                fieldnames=["id", "shop_id", "product_id", "price_id", "promotion_id", "rating"]
+            )
+            writer.writeheader()
+
+            for shop_id, product_id in unique_pairs:
+                sale_product_id = str(uuid.uuid4())
+                writer.writerow({
+                    "id": sale_product_id,
+                    "shop_id": shop_id,
+                    "product_id": product_id,
+                    "price_id": random.choice(self.price_ids),
+                    "promotion_id": self.__get_random_promotion_id(),
+                    "rating": None,
+                })
+                self.promotion_ids.append(sale_product_id)
+
+    def retailer_distributor_to_csv(self, num: int):
+        """
+        Метод для генерации продаж товаров
+        """
+        if not self.retailer_ids or not self.distributor_ids:
+            print("Нет либо ритейлеров, либо дистрибьюторов")
+            return
+
+        unique_pairs = set()
+
+        while len(unique_pairs) < num:
+            retailer_id = random.choice(self.retailer_ids)
+            distributor_id = random.choice(self.distributor_ids)
+
+            unique_pairs.add((retailer_id, distributor_id))
+
+        with open(file=RETAILER_DISTRIBUTOR_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(
+                file,
+                fieldnames=["retailer_id", "distributor_id"]
+            )
+            writer.writeheader()
+
+            for retailer_id, distributor_id in unique_pairs:
+                writer.writerow({
+                    "retailer_id": retailer_id,
+                    "distributor_id": distributor_id
+                })
+
+    def distributor_manufacturer_to_csv(self, num: int):
+        """
+        Метод для генерации продаж товаров
+        """
+        if not self.distributor_ids or not self.manufacturer_ids:
+            print("Нет либо дистрибьюторов, либо производителей")
+            return
+
+        unique_pairs = set()
+
+        while len(unique_pairs) < num:
+            distributor_id = random.choice(self.distributor_ids)
+            manufacturer_id = random.choice(self.manufacturer_ids)
+
+            unique_pairs.add((distributor_id, manufacturer_id))
+
+        with open(file=DISTRIBUTOR_MANUFACTURER_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(
+                file,
+                fieldnames=["distributor_id", "manufacturer_id"]
+            )
+            writer.writeheader()
+
+            for distributor_id, manufacturer_id in unique_pairs:
+                writer.writerow({
+                    "distributor_id": distributor_id,
+                    "manufacturer_id": manufacturer_id
+                })
 
     @staticmethod
     def __get_product_name_by_category(category: str, food_faker: Food):
@@ -518,11 +608,50 @@ class Generator:
         return random_date
 
     @staticmethod
+    def __get_promotion_type():
+        """
+        Метод для получения типа акции
+        """
+        promotion_type = random.choice(PROMOTION_TYPES)
+
+        if promotion_type == PROMOTION_TYPES[2]:
+            return promotion_type + random.choice(BUYER_CATEGORIES)
+
+        if promotion_type == PROMOTION_TYPES[3]:
+            return promotion_type + random.choice(PROMOTION_EVENTS)
+
+        return promotion_type
+
+    @staticmethod
     def __get_discount_size_by_promotion_type(promotion_type):
         """
         Метод для получения случайного размера скидки по типу акции
         """
-        if promotion_type == PROMOTION_TYPES[1]:
+        if PROMOTION_TYPES[1] in promotion_type:
             return None
 
         return random.randint(5, 99)
+
+    def __get_random_shop_and_product_by_retailer(self):
+        """
+        Метод получает случайные магазин и товар с одинаковым ритейлером
+        """
+        while True:
+            shop_id = random.choice(self.shop_retailer_ids)
+            product_id = random.choice(self.product_retailer_ids)
+
+            if shop_id[1] == product_id[1]:
+                break
+
+        return shop_id[0], product_id[0]
+
+    def __get_random_promotion_id(self):
+        """
+        Метод для получения акции, если она выпадет
+        """
+        is_promotion = random.choice([True, False])
+
+        if not is_promotion:
+            return None
+
+        return random.choice(self.promotion_ids)
