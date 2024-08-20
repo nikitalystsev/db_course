@@ -1,6 +1,7 @@
 import csv
 import datetime
 import random
+import string
 import uuid
 
 from faker import Faker
@@ -73,7 +74,8 @@ CERTIFICATE_COMPLIANCE_NORMATIVE_DOCUMENTS = [
     'ТР ТС 024/2011 «Технический регламент на масложировую продукцию»',
     'ТР ТС 027/2012 «О безопасности отдельных видов специализированной пищевой '
     'продукции, в том числе диетического лечебного и диетического профилактического питания»',
-    'ТР ТС 029/2012 «Требования безопасности пищевых добавок, ароматизаторов и технологических вспомогательных средств»',
+    'ТР ТС 029/2012 «Требования безопасности пищевых добавок, '
+    'ароматизаторов и технологических вспомогательных средств»',
     'ТР ТС 033/2013 «О безопасности молока и молочной продукции»',
     'ТР ТС 034/2013 «О безопасности мяса и мясной продукции»',
     'ТР ЕАЭС 040/2016 «О безопасности рыбы и рыбной продукции»'
@@ -283,10 +285,14 @@ class Generator:
                 certificate_compliance_id = str(uuid.uuid4())
                 product_id = random.choice(self.product_retailer_ids)[0]
                 dates = self.__get_random_dates()
+                certificate_type = random.choice(CERTIFICATE_COMPLIANCE_TYPES)
 
                 writer.writerow({
                     "id": certificate_compliance_id,
                     "product_id": product_id,
+                    "type": certificate_type,
+                    "number": self.__get_certificate_number_by_type(certificate_type),
+                    "normative_document": random.choice(CERTIFICATE_COMPLIANCE_NORMATIVE_DOCUMENTS),
                     "status_compliance": True,
                     "registration_data": dates[0],
                     "expiration_data": dates[1]
@@ -322,3 +328,100 @@ class Generator:
         date_2 = now - datetime.timedelta(days=days_delta_2)
 
         return date_1, date_2
+
+    @staticmethod
+    def __get_vsd_number():
+        """
+        Генерирует номер ветеринарной сопроводительной документации в формате
+        A653-D6D8-9B92-4C05-BFDA-513D-80B3-E48D.
+        """
+        segments = []
+
+        for _ in range(8):  # Всего 8 сегментов
+            # Генерируем сегмент: 4 символа (буквы и цифры) + 4 цифры
+            segment = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+            segment += '-' + ''.join(random.choices(string.digits, k=4))
+            segments.append(segment)
+
+        # Объединяем сегменты в одну строку
+        document_number = '-'.join(segments)
+
+        return document_number
+
+    @staticmethod
+    def __get_declaration_number():
+        """
+        Генерирует номер декларации о соответствии в формате:
+        ТС N Д-RU С-NL.НВ96.В.01216/24
+        """
+
+        # Генерируем случайные части номера
+        ts_number = "ТС N Д-" + random.choice(["RU", "KZ", "BY"])  # Пример: RU, KZ, BY
+        country_code = random.choice(["RU", "NL", "US", "CN"])  # Пример стран
+        nv_part = "НВ" + str(random.randint(10, 99))  # Номер от 10 до 99
+        version_part = "В." + str(random.randint(1, 9))  # Версия от 1 до 9
+        serial_number = str(random.randint(10000, 99999))  # Серийный номер от 10000 до 99999
+        year_part = str(random.randint(20, 24))  # Год от 20 до 24
+
+        # Формируем итоговый номер декларации
+        declaration_number = f"{ts_number} С-{country_code}.{nv_part}.{version_part}.{serial_number}/{year_part}"
+
+        return declaration_number
+
+    @staticmethod
+    def __get_gost_certificate_number():
+        """
+        Генерирует номер сертификата соответствия ГОСТ Р в формате:
+        РОСС RU.0001.11МТ49
+        """
+
+        # Генерируем случайные части номера
+        prefix = "РОСС"
+        country_code = "RU"
+        registration_number = f"{random.randint(1000, 9999)}"  # Четырехзначный регистрационный номер
+        year_code = f"{random.randint(10, 99)}"  # Двухзначный код года
+        suffix = ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ', k=2)) + str(
+            random.randint(10, 99))  # Две буквы и двухзначное число
+
+        # Формируем итоговый номер сертификата
+        certificate_number = f"{prefix} {country_code}.{registration_number}.{year_code}{suffix}"
+
+        return certificate_number
+
+    @staticmethod
+    def __get_sgr_number():
+        """
+        Генерирует номер СГР на пищевую продукцию в формате:
+        RU.77.99.11.003.E.021866.05.11
+        """
+
+        # Генерируем случайные части номера
+        country_code = "RU"
+        region_code = f"{random.randint(10, 99)}"  # Двухзначный код региона
+        category_code = f"{random.randint(10, 99)}"  # Двухзначный код категории
+        product_code = f"{random.randint(10, 99)}"  # Двухзначный код продукта
+        registration_number = f"{random.randint(100, 999)}"  # Трехзначный регистрационный номер
+        status_code = random.choice(['E', 'C'])  # Код статуса (E или C)
+        serial_number = f"{random.randint(100000, 999999)}"  # Шестизначный серийный номер
+        date_code = f"{random.randint(1, 12):02}.{random.randint(1, 31):02}"  # Дата (месяц.число)
+
+        # Формируем итоговый номер СГР
+        sgr_number = (f"{country_code}.{region_code}.{category_code}."
+                      f"{product_code}.{registration_number}.{status_code}.{serial_number}.{date_code}")
+
+        return sgr_number
+
+    def __get_certificate_number_by_type(self, certificate_type: str):
+        """
+        Метод генерирует номер сертификата по его типу
+        """
+        if certificate_type == CERTIFICATE_COMPLIANCE_TYPES[1]:
+            return self.__get_declaration_number()
+
+        if certificate_type == CERTIFICATE_COMPLIANCE_TYPES[2]:
+            return self.__get_gost_certificate_number()
+
+        if certificate_type == CERTIFICATE_COMPLIANCE_TYPES[3]:
+            return self.__get_sgr_number()
+
+        return self.__get_vsd_number()
