@@ -4,8 +4,8 @@ import (
 	"SmartShopper-services/core/dto"
 	"SmartShopper-services/core/models"
 	"SmartShopper-services/errs"
-	"SmartShopper-services/infRepo"
 	"SmartShopper-services/intf"
+	"SmartShopper-services/intfRepo"
 	"SmartShopper-services/pkg/auth"
 	"SmartShopper-services/pkg/hash"
 	"context"
@@ -21,7 +21,7 @@ const (
 )
 
 type UserService struct {
-	userRepo        infRepo.IUserRepo
+	userRepo        intfRepo.IUserRepo
 	tokenManager    auth.ITokenManager
 	hasher          hash.IPasswordHasher
 	accessTokenTTL  time.Duration
@@ -29,7 +29,7 @@ type UserService struct {
 }
 
 func NewUserService(
-	userRepo infRepo.IUserRepo,
+	userRepo intfRepo.IUserRepo,
 	tokenManager auth.ITokenManager,
 	hasher hash.IPasswordHasher,
 	accessTokenTTL time.Duration,

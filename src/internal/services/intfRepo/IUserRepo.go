@@ -1,4 +1,4 @@
-package infRepo
+package intfRepo
 
 import (
 	"SmartShopper-services/core/models"

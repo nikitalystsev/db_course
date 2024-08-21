@@ -93,7 +93,7 @@ alter table ss.sale_product
     alter column shop_id set not null,
     alter column product_id set not null,
     alter column price_id set not null,
-    add check (rating >= 0 and rating <= 5),
+    add check (avg_rating >= 0 and avg_rating <= 5),
     add unique (shop_id, product_id);
 
 alter table ss.rating

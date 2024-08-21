@@ -4,6 +4,10 @@ from generator import Generator
 
 COUNT_RECORDS = 2000
 
+"""
+Поменять в схемах в сущности sale_product rating -> avg_rating !!!!!!
+"""
+
 
 def main() -> None:
     faker = Faker("ru_RU")

@@ -401,7 +401,7 @@ class Generator:
         with open(file=SALE_PRODUCT_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.DictWriter(
                 file,
-                fieldnames=["id", "shop_id", "product_id", "price_id", "promotion_id", "rating"]
+                fieldnames=["id", "shop_id", "product_id", "price_id", "promotion_id", "avg_rating"]
             )
             writer.writeheader()
 
@@ -413,7 +413,7 @@ class Generator:
                     "product_id": product_id,
                     "price_id": random.choice(self.price_ids),
                     "promotion_id": self.__get_random_promotion_id(),
-                    "rating": None,
+                    "avg_rating": None,
                 })
                 self.sale_product_ids.append(sale_product_id)
 
