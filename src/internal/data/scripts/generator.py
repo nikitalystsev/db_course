@@ -15,7 +15,6 @@ SHOP_DATA_PATH = "../data/shop.csv"
 PRODUCT_DATA_PATH = "../data/product.csv"
 CERTIFICATE_COMPLIANCE_DATA_PATH = "../data/certificate_compliance.csv"
 USER_DATA_PATH = "../data/user.csv"
-PRICE_DATA_PATH = "../data/price.csv"
 PROMOTION_DATA_PATH = "../data/promotion.csv"
 SALE_PRODUCT_DATA_PATH = "../data/sale_product.csv"
 RATING_DATA_PATH = "../data/rating.csv"
@@ -122,7 +121,6 @@ class Generator:
         self.shop_retailer_ids = []
         self.product_retailer_ids = []
 
-        self.price_ids = []
         self.promotion_ids = []
 
         self.sale_product_ids = []
@@ -336,26 +334,6 @@ class Generator:
                     "expiration_data": dates[0]
                 })
 
-    def prices_to_csv(self, num: int):
-        """
-        Метод для генерации цен
-        """
-        self.price_ids.clear()
-
-        with open(file=PRICE_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
-            writer = csv.DictWriter(file, fieldnames=["id", "price", "currency", "setting_date"])
-            writer.writeheader()
-
-            for _ in range(num):
-                price_id = str(uuid.uuid4())
-                writer.writerow({
-                    "id": price_id,
-                    "price": round(random.uniform(100, 5000), 2),
-                    "currency": self.faker.currency_code(),
-                    "setting_date": self.__get_random_date_in_past(),
-                })
-                self.price_ids.append(price_id)
-
     def promotions_to_csv(self, num: int):
         """
         Метод для генерации акций
@@ -387,8 +365,8 @@ class Generator:
         """
         Метод для генерации продаж товаров
         """
-        if not self.shop_retailer_ids or not self.product_retailer_ids or not self.price_ids or not self.promotion_ids:
-            print("Нет либо магазинов, либо товаров, либо цен, либо акций")
+        if not self.shop_retailer_ids or not self.product_retailer_ids or not self.promotion_ids:
+            print("Нет либо магазинов, либо товаров, либо акций")
             return
 
         self.sale_product_ids.clear()
@@ -401,7 +379,8 @@ class Generator:
         with open(file=SALE_PRODUCT_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.DictWriter(
                 file,
-                fieldnames=["id", "shop_id", "product_id", "price_id", "promotion_id", "avg_rating"]
+                fieldnames=["id", "shop_id", "product_id", "promotion_id", "price", "currency", "setting_date",
+                            "avg_rating"]
             )
             writer.writeheader()
 
@@ -411,8 +390,10 @@ class Generator:
                     "id": sale_product_id,
                     "shop_id": shop_id,
                     "product_id": product_id,
-                    "price_id": random.choice(self.price_ids),
                     "promotion_id": self.__get_random_promotion_id(),
+                    "price": round(random.uniform(100, 5000), 2),
+                    "currency": self.faker.currency_code(),
+                    "setting_date": self.__get_random_date_in_past(),
                     "avg_rating": None,
                 })
                 self.sale_product_ids.append(sale_product_id)

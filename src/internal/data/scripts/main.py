@@ -20,7 +20,6 @@ def main() -> None:
     generator.shops_to_csv(COUNT_RECORDS)
     generator.products_to_csv(COUNT_RECORDS)
     generator.certificates_compliance_to_csv(COUNT_RECORDS)
-    generator.prices_to_csv(COUNT_RECORDS)
     generator.promotions_to_csv(COUNT_RECORDS)
     generator.sale_products_to_csv(COUNT_RECORDS / 2)
     generator.retailer_distributor_to_csv(COUNT_RECORDS)

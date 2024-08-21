@@ -8,14 +8,13 @@ create role registered;
 
 grant guest to registered;
 
-grant insert on table ss.price to registered;
 grant insert on table ss.promotion to registered;
 grant insert on table ss.sale_product to registered;
 grant insert on table ss.rating to registered;
 grant insert on table ss.shop to registered;
 grant insert on table ss.product to registered;
 
-grant update on table ss.price to registered;
+grant update on table ss.sale_product to registered;
 
 
 create role administrator;

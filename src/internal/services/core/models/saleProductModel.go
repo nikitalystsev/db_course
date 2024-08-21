@@ -9,16 +9,11 @@ type SaleProductModel struct {
 	ID          uuid.UUID `json:"id" db:"id"`
 	ShopID      uuid.UUID `json:"shop_id" db:"shop_id"`
 	ProductID   uuid.UUID `json:"product_id" db:"product_id"`
-	PriceID     uuid.UUID `json:"price_id" db:"price_id"`
 	PromotionID uuid.UUID `json:"promotion_id" db:"promotion_id"`
-	Rating      int       `json:"rating" db:"rating"`
-}
-
-type PriceModel struct {
-	ID          uuid.UUID `json:"id" db:"id"`
 	Price       uuid.UUID `json:"price" db:"price"`
 	Currency    string    `json:"currency" db:"currency"`
 	SettingDate time.Time `json:"setting_date" db:"setting_date"`
+	AvgRating   int       `json:"avg_rating" db:"avg_rating"`
 }
 
 type PromotionModel struct {

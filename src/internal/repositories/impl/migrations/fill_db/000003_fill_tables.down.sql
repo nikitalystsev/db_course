@@ -11,9 +11,6 @@ delete
 from ss.promotion;
 
 delete
-from ss.price;
-
-delete
 from ss.certificate_compliance;
 
 delete

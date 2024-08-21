@@ -79,14 +79,6 @@ create table if not exists ss.user
     registration_data date
 );
 
-create table if not exists ss.price
-(
-    id           uuid primary key default uuid_generate_v4(),
-    price        numeric,
-    currency     text,
-    setting_date date
-);
-
 create table if not exists ss.promotion
 (
     id            uuid primary key default uuid_generate_v4(),
@@ -102,12 +94,13 @@ create table if not exists ss.sale_product
     id           uuid primary key default uuid_generate_v4(),
     shop_id      uuid,
     product_id   uuid,
-    price_id     uuid,
     promotion_id uuid,
+    price        numeric,
+    currency     text,
+    setting_date date,
     avg_rating   float,
     foreign key (shop_id) references shop (id) on delete cascade on update cascade,
     foreign key (product_id) references product (id) on delete cascade on update cascade,
-    foreign key (price_id) references price (id) on delete cascade on update cascade,
     foreign key (promotion_id) references promotion (id) on delete cascade on update cascade
 );
 
