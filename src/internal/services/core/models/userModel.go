@@ -12,3 +12,8 @@ type UserModel struct {
 	Password         string    `json:"password" db:"password"`
 	RegistrationDate time.Time `json:"registration_date" db:"registration_date"`
 }
+
+type Tokens struct {
+	AccessToken  string
+	RefreshToken string
+}
