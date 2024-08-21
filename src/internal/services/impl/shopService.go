@@ -45,11 +45,6 @@ func (ss *ShopService) GetByID(ctx context.Context, ID uuid.UUID) (*models.ShopM
 		return nil, errs.ErrShopDoesNotExists
 	}
 
-	err = ss.shopRepo.DeleteByID(ctx, ID)
-	if err != nil {
-		return nil, err
-	}
-
 	return existingShop, nil
 }
 
