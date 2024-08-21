@@ -64,13 +64,6 @@
 		\item expiration\_date -- дата окончания действия сертификата.
 	\end{itemize}
 	
-	\item \textbf{Price} -- представляет объект цены товара. Содержит следующие поля: 
-	\begin{itemize}
-		\item price -- цена товара;
-		\item currency -- валюта;
-		\item setting\_date -- дата установки цены.
-	\end{itemize}
-	
 	\item \textbf{Promotion} -- представляет объект акции на товар. Содержит следующие поля: 
 	\begin{itemize}
 		\item type -- тип акции;
@@ -116,9 +109,11 @@
 	\begin{itemize}
 		\item shop\_id -- идентификатор магазина, продающего товар;
 		\item product\_id -- идентификатор продаваемого товара;
-		\item price\_id -- идентификатор цены на товар;
 		\item promotion\_id -- идентификатор применяемой к товару акции (если она есть);
-		\item rating -- средний рейтинг товара в магазине.
+		\item price -- цена товара;
+		\item currency -- валюта;
+		\item setting\_date -- дата установки цены.
+		\item avg\_rating -- средний рейтинг товара в магазине.
 	\end{itemize}
 	
 \end{enumerate}
@@ -172,30 +167,9 @@
 		\end{threeparttable}			
 	\end{center}
 \end{table}
+L
 
-\begin{table}[ht]
-	\begin{center}
-		\begin{threeparttable}
-			\caption{Ограничения целостности таблицы Price}
-			\label{tbl:entity_price}
-			\begin{tabular}{|p{4.5cm}|p{2.5cm}|p{8.5cm}|}
-				\hline 
-				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
-				\hline
-				price & число & Не должно быть пустым. Не должно быть меньше 0  \\
-				\hline
-				currency & строка & Не должно быть пустым  \\
-				\hline
-				setting\_date & дата & Не должно быть пустым  \\
-				\hline
-			\end{tabular}
-		\end{threeparttable}			
-	\end{center}
-\end{table}
-
-\clearpage
-
-\begin{table}[ht]
+\begin{table}[!h]
 	\begin{center}
 		\begin{threeparttable}
 			\caption{Ограничения целостности таблицы Rating}
@@ -276,7 +250,7 @@
 
 Для таблиц Retailer, Distributor, Manufacturer определены следующие ограничения полей: 
 
-\begin{table}[ht]
+\begin{table}[!h]
 	\begin{center}
 		\begin{threeparttable}
 			\caption{Ограничения целостности таблиц Retailer, Distributor и Manufacturer}
@@ -348,11 +322,15 @@
 				\hline
 				product\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Product \\
 				\hline
-				price\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Price  \\
-				\hline
 				promotion\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Promotion \\
 				\hline
-				rating & число & Не должно быть пустым. Не может быть меньше 0 и больше 5 \\
+				price & число & Не должно быть пустым. Не должно быть меньше 0  \\
+				\hline
+				currency & строка & Не должно быть пустым  \\
+				\hline
+				setting\_date & дата & Не должно быть пустым  \\
+				\hline
+				avg\_rating & число & Не должно быть пустым. Не может быть меньше 0 и больше 5 \\
 				\hline
 			\end{tabular}
 		\end{threeparttable}			
