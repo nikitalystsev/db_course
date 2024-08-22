@@ -70,7 +70,7 @@ alter table ss.user
     alter column phone_number set not null,
     add unique (phone_number),
     alter column password set not null,
-    alter column registration_data set not null;
+    alter column registration_date set not null;
 
 alter table ss.promotion
     alter column id set not null,

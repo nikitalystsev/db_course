@@ -90,6 +90,15 @@ func (us *UserService) SignIn(ctx context.Context, user *dto.UserSignInDTO) (mod
 	return us.createTokens(ctx, exitingUser.ID, "") // пока что пустая роль
 }
 
+func (us *UserService) RefreshTokens(ctx context.Context, refreshToken string) (models.Tokens, error) {
+	existingReader, err := us.userRepo.GetByRefreshToken(ctx, refreshToken)
+	if err != nil {
+		return models.Tokens{}, err
+	}
+
+	return us.createTokens(ctx, existingReader.ID, "") // пока что пустая роль
+}
+
 func (us *UserService) baseValidation(ctx context.Context, user *models.UserModel) error {
 	existingUser, err := us.userRepo.GetByPhoneNumber(ctx, user.PhoneNumber)
 

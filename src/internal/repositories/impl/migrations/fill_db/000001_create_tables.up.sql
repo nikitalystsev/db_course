@@ -76,7 +76,7 @@ create table if not exists ss.user
     fio               text,
     phone_number      varchar(30),
     password          text,
-    registration_data date
+    registration_date date
 );
 
 create table if not exists ss.promotion

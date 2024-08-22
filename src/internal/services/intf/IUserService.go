@@ -7,6 +7,7 @@ import (
 )
 
 type IUserService interface {
-	SignUp(ctx context.Context, reader *models.UserModel) error
-	SignIn(ctx context.Context, reader *dto.UserSignInDTO) (models.Tokens, error)
+	SignUp(ctx context.Context, user *models.UserModel) error
+	SignIn(ctx context.Context, user *dto.UserSignInDTO) (models.Tokens, error)
+	RefreshTokens(ctx context.Context, refreshToken string) (models.Tokens, error)
 }

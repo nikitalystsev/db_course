@@ -1,5 +1,6 @@
 create role guest;
 
+grant usage on schema ss to guest;
 grant select on all tables in schema ss to guest;
 grant insert on table ss.user to guest;
 
@@ -19,7 +20,6 @@ grant update on table ss.sale_product to registered;
 
 create role administrator;
 
-grant guest to administrator;
 grant registered to administrator;
 
 grant all privileges on all tables in schema ss to administrator;

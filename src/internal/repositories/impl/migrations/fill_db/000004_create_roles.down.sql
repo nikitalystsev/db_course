@@ -8,7 +8,6 @@ drop user if exists guest_user;
 
 revoke all privileges on all tables in schema ss from administrator;
 revoke registered from administrator;
-revoke guest from administrator;
 
 revoke update on table ss.sale_product from registered;
 revoke insert on table ss.promotion from registered;
@@ -20,6 +19,7 @@ revoke guest from registered;
 
 revoke insert on table ss."user" from guest;
 revoke select on all tables in schema ss from guest;
+revoke usage on schema ss from guest;
 
 drop role if exists administrator;
 drop role if exists registered;
