@@ -66,7 +66,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		guest.GET("/products/:id", h.getProductByID)
 	}
 
-	registered := router.Group("/api", h.userIdentity)
+	registered := router.Group("/techUI", h.userIdentity)
 	{
 		registered.POST("/ratings", h.addSaleProductRating)
 	}

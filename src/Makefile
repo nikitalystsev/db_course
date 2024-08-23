@@ -1,12 +1,20 @@
-run: build
-	./app
+run: build-ui run-app
+	./ui
 
-build:
-	docker compose up ss-postgres ss-redis
-	go build -o app cmd/app/main.go
+build-ui:
+	go build -o ui cmd/ui/main.go
+
+run-app: build-app
+	docker compose up -d ss-app ss-postgres ss-redis
+
+build-app:
+	docker build -t smartshopper:local .
 
 migrate-up:
 	./migrate.sh up
 
 migrate-down:
 	./migrate.sh down
+
+clean:
+	rm ./ui

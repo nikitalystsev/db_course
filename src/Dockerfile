@@ -3,11 +3,16 @@ FROM golang:latest AS builder
 WORKDIR /usr/local/src
 
 COPY ["./go.mod", "./go.sum", "./go.work", "./go.work.sum", "./"]
-COPY ./internal ./internal
+
+COPY ./internal/repositories ./internal/repositories
+COPY ./internal/services ./internal/services
+COPY ./internal/api ./internal/api
 
 RUN go mod download
 
-COPY ./cmd ./cmd
+COPY ./cmd/app ./cmd/app
+COPY ./internal/app ./internal/app
+COPY ./internal/config ./internal/config
 
 RUN go build -o ./bin/app cmd/app/main.go
 

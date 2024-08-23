@@ -1,13 +1,13 @@
 package app
 
 import (
+	"SmartShopper-api/handlers"
 	repositories "SmartShopper-postgres"
 	"SmartShopper-postgres/impl"
 	implServices "SmartShopper-services/impl"
 	"SmartShopper-services/intfRepo"
 	"SmartShopper-services/pkg/auth"
 	"SmartShopper-services/pkg/hash"
-	"SmartShopper-ui/handlers"
 	"SmartShopper/internal/config"
 	"fmt"
 	"github.com/go-redis/redis/v8"
@@ -77,11 +77,9 @@ func Run(configDir string) {
 	)
 	router := handler.InitRoutes()
 
-	fmt.Println("Server was successfully started!")
-
 	err = router.Run(":" + cfg.Port)
 	if err != nil {
-		fmt.Printf("error run server: %v", err)
 		return
 	}
+	fmt.Println("Server was successfully started!")
 }
