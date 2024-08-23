@@ -11,7 +11,7 @@ type ProductModel struct {
 	Categories     string    `json:"categories" db:"categories"`
 	Brand          string    `json:"brand" db:"brand"`
 	Compound       string    `json:"compound" db:"compound"`
-	GrossMass      int       `json:"gross_mass" db:"gross_mass"`
-	NetMass        int       `json:"net_mass" db:"net_mass"`
+	GrossMass      float32   `json:"gross_mass" db:"gross_mass"`
+	NetMass        float32   `json:"net_mass" db:"net_mass"`
 	PackageType    string    `json:"package_type" db:"package_type"`
 }

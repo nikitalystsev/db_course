@@ -15,6 +15,19 @@ x-redis: &redis
     '
 
 services:
+  ss-app:
+    image: smartshopper:local
+    container_name: ss-app
+    ports:
+      - "8000:8000"
+    depends_on:
+      ss-postgres:
+        condition: service_healthy
+      ss-redis:
+        condition: service_started
+    networks:
+      - ss
+
   ss-postgres:
     image: postgres:latest
     container_name: ss-postgres
@@ -35,7 +48,7 @@ services:
     networks:
       - ss
 
-  bs-redis:
+  ss-redis:
     <<: *redis
     container_name: ss-redis
     volumes:

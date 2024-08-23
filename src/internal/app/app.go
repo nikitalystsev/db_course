@@ -21,7 +21,9 @@ func Run(configDir string) {
 	}
 
 	var (
-		userRepo intfRepo.IUserRepo
+		userRepo    intfRepo.IUserRepo
+		productRepo intfRepo.IProductRepo
+		ratingRepo  intfRepo.IRatingRepo
 	)
 
 	client := redis.NewClient(&redis.Options{
@@ -44,6 +46,8 @@ func Run(configDir string) {
 	}
 
 	userRepo = impl.NewUserRepo(db, client)
+	productRepo = impl.NewProductRepo(db)
+	ratingRepo = impl.NewRatingRepo(db)
 
 	tokenManager, err := auth.NewTokenManager(cfg.Auth.JWT.SigningKey)
 	if err != nil {
@@ -60,14 +64,17 @@ func Run(configDir string) {
 		cfg.Auth.JWT.AccessTokenTTL,
 		cfg.Auth.JWT.RefreshTokenTTL,
 	)
+	productService := implServices.NewProductService(productRepo)
+	ratingService := implServices.NewRatingService(ratingRepo)
 
 	handler := handlers.NewHandler(
+		productService,
 		userService,
+		ratingService,
 		tokenManager,
 		cfg.Auth.JWT.AccessTokenTTL,
 		cfg.Auth.JWT.RefreshTokenTTL,
 	)
-
 	router := handler.InitRoutes()
 
 	fmt.Println("Server was successfully started!")

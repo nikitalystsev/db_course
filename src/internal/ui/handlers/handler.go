@@ -16,27 +16,30 @@ type Handler struct {
 	shopService        intf.IShopService
 	supplierService    intf.ISupplierService
 	userService        intf.IUserService
+	ratingService      intf.IRatingService
 	tokenManager       auth.ITokenManager
 	accessTokenTTL     time.Duration
 	refreshTokenTTL    time.Duration
 }
 
 func NewHandler(
-	//productService intf.IProductService,
+	productService intf.IProductService,
 	//saleProductService intf.ISaleProductService,
 	//shopService intf.IShopService,
 	//supplierService intf.ISupplierService,
 	userService intf.IUserService,
+	ratingService intf.IRatingService,
 	tokenManager auth.ITokenManager,
 	accessTokenTTL time.Duration,
 	refreshTokenTTL time.Duration,
 ) *Handler {
 	return &Handler{
-		//productService:     productService,
+		productService: productService,
 		//saleProductService: saleProductService,
 		//shopService:        shopService,
 		//supplierService:    supplierService,
 		userService:     userService,
+		ratingService:   ratingService,
 		tokenManager:    tokenManager,
 		accessTokenTTL:  accessTokenTTL,
 		refreshTokenTTL: refreshTokenTTL,
@@ -58,6 +61,15 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		authenticate.POST("/refresh", h.refresh)
 	}
 
+	guest := router.Group("/")
+	{
+		guest.GET("/products/:id", h.getProductByID)
+	}
+
+	registered := router.Group("/api", h.userIdentity)
+	{
+		registered.POST("/ratings", h.addSaleProductRating)
+	}
 	return router
 }
 
