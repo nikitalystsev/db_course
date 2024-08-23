@@ -2,11 +2,12 @@ package requesters
 
 import (
 	"SmartShopper/internal/techUI/input"
+	myCache "SmartShopper/pkg/cache"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-humble/locstor"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -17,7 +18,7 @@ const mainMenu = `Главное меню:
 `
 
 type Requester struct {
-	localStorage    *locstor.DataStore
+	cache           myCache.ICache
 	accessTokenTTL  time.Duration
 	refreshTokenTTL time.Duration
 	baseURL         string
@@ -25,7 +26,7 @@ type Requester struct {
 
 func NewRequester(accessTokenTTL, refreshTokenTTL time.Duration, port string) *Requester {
 	return &Requester{
-		localStorage:    locstor.NewDataStore(locstor.JSONEncoding),
+		cache:           myCache.NewCache(),
 		accessTokenTTL:  accessTokenTTL,
 		refreshTokenTTL: refreshTokenTTL,
 		baseURL:         "http://localhost:" + port,
@@ -51,7 +52,13 @@ func (r *Requester) Run() {
 				fmt.Printf("\n\n%s\n", err.Error())
 			}
 		case 2:
-
+			if err = r.processUserActions(); err != nil {
+				fmt.Printf("\n\n%s\n", err.Error())
+			}
+		case 0:
+			os.Exit(0)
+		default:
+			fmt.Printf("\n\nНеверный пункт меню!\n")
 		}
 	}
 }

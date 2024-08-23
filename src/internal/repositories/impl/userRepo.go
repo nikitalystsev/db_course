@@ -7,6 +7,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"time"
@@ -59,10 +60,12 @@ func (ur *UserRepo) GetByPhoneNumber(ctx context.Context, phoneNumber string) (*
 }
 
 func (ur *UserRepo) SaveRefreshToken(ctx context.Context, id uuid.UUID, token string, ttl time.Duration) error {
-	err := ur.client.Set(ctx, id.String(), token, ttl).Err()
-	if err != nil {
+	if err := ur.client.Set(ctx, token, id.String(), ttl).Err(); err != nil {
+		fmt.Println("Ошибка сохранения")
 		return err
 	}
+
+	fmt.Println("Успешно сохранили!")
 
 	return nil
 }
@@ -72,17 +75,17 @@ func (ur *UserRepo) GetByRefreshToken(ctx context.Context, refreshToken string) 
 	if err != nil && !errors.Is(err, redis.Nil) {
 		return nil, err
 	}
-	if err != nil && errors.Is(err, redis.Nil) {
+	if errors.Is(err, redis.Nil) {
+		fmt.Println("Нет пользователя")
 		return nil, errs.ErrUserDoesNotExists
 	}
 
 	var ID uuid.UUID
-	ID, err = uuid.Parse(IDStr)
-	if err != nil {
+	if ID, err = uuid.Parse(IDStr); err != nil {
 		return nil, err
 	}
 
-	query := `select id, fio, phone_number, password, registration_data from ss.user where id = $1`
+	query := `select id, fio, phone_number, password, registration_date from ss.user where id = $1`
 
 	var user models.UserModel
 	err = ur.db.GetContext(ctx, &user, query, ID)

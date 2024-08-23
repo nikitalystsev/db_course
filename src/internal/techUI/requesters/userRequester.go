@@ -36,7 +36,7 @@ func (r *Requester) processUserActions() error {
 		switch menuItem {
 		case 0:
 			close(stopRefresh)
-			fmt.Println("\n\nВы успешно вышли из системы!")
+			fmt.Printf("\n\nВы успешно вышли из системы!\n")
 			return nil
 		default:
 			fmt.Printf("\n\nНеверный пункт меню!\n")
@@ -53,7 +53,7 @@ func (r *Requester) signIn(stopRefresh <-chan struct{}) error {
 	}
 
 	request := HTTPRequest{
-		Method: "POST",
+		Method: http.MethodPost,
 		URL:    r.baseURL + "/auth/sign-in",
 		Headers: map[string]string{
 			"Content-Type": "application/json",
@@ -79,11 +79,10 @@ func (r *Requester) signIn(stopRefresh <-chan struct{}) error {
 	if err = json.Unmarshal(response.Body, &tokens); err != nil {
 		return err
 	}
-	if err = r.localStorage.Save("tokens", tokens); err != nil {
-		return err
-	}
 
-	fmt.Printf("\n\nAuthentication successful!\n")
+	r.cache.Set("tokens", tokens)
+
+	fmt.Printf("\n\nВы успешно вошли в систему!\n")
 
 	go r.Refreshing(r.accessTokenTTL, stopRefresh)
 
@@ -92,11 +91,12 @@ func (r *Requester) signIn(stopRefresh <-chan struct{}) error {
 
 func (r *Requester) Refresh() error {
 	var tokens dto.ReaderTokensDTO
-	if err := r.localStorage.Find("tokens", &tokens); err != nil {
+	if err := r.cache.Get("tokens", &tokens); err != nil {
 		return err
 	}
+
 	request := HTTPRequest{
-		Method: "POST",
+		Method: http.MethodPost,
 		URL:    r.baseURL + "/auth/refresh",
 		Headers: map[string]string{
 			"Content-Type": "application/json",
@@ -121,9 +121,8 @@ func (r *Requester) Refresh() error {
 	if err = json.Unmarshal(response.Body, &tokens); err != nil {
 		return err
 	}
-	if err = r.localStorage.Save("tokens", tokens); err != nil {
-		return err
-	}
+
+	r.cache.Set("tokens", tokens)
 
 	//fmt.Printf("\n\nSuccessful refresh tokens!\n")
 
