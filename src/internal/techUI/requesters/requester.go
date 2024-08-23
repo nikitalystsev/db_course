@@ -50,6 +50,8 @@ func (r *Requester) Run() {
 			if err = r.signUp(); err != nil {
 				fmt.Printf("\n\n%s\n", err.Error())
 			}
+		case 2:
+
 		}
 	}
 }
