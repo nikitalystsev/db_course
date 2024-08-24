@@ -99,7 +99,7 @@ func (ss *SupplierService) GetDistributorByID(ctx context.Context, distributorID
 }
 
 func (ss *SupplierService) GetManufacturerByID(ctx context.Context, retailerID uuid.UUID) (*models.SupplierModel, error) {
-	existingRetailer, err := ss.supplierRepo.GetRetailerByID(ctx, retailerID)
+	existingRetailer, err := ss.supplierRepo.GetManufacturerByID(ctx, retailerID)
 	if err != nil && !errors.Is(err, errs.ErrManufacturerDoesNotExists) {
 		return nil, err
 	}

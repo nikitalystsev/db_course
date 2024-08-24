@@ -134,14 +134,14 @@ class Generator:
         self.faker = Faker("ru_RU")
 
         with open(file=RETAILER_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
-            writer = csv.DictWriter(file, fieldnames=["id", "name", "address", "phone_number", "fio_representative"])
+            writer = csv.DictWriter(file, fieldnames=["id", "title", "address", "phone_number", "fio_representative"])
             writer.writeheader()
 
             for _ in range(num):
                 retailer_id = str(uuid.uuid4())
                 writer.writerow({
                     "id": retailer_id,
-                    "name": self.faker.company(),
+                    "title": self.faker.company(),
                     "address": self.faker.unique.address().replace("\n", ", "),
                     "phone_number": self.faker.unique.phone_number(),
                     "fio_representative": self.faker.unique.name()
@@ -157,14 +157,14 @@ class Generator:
         self.faker = Faker("ru_RU")
 
         with open(file=DISTRIBUTOR_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
-            writer = csv.DictWriter(file, fieldnames=["id", "name", "address", "phone_number", "fio_representative"])
+            writer = csv.DictWriter(file, fieldnames=["id", "title", "address", "phone_number", "fio_representative"])
             writer.writeheader()
 
             for _ in range(num):
                 distributor_id = str(uuid.uuid4())
                 writer.writerow({
                     "id": distributor_id,
-                    "name": self.faker.company(),
+                    "title": self.faker.company(),
                     "address": self.faker.unique.address().replace("\n", ", "),
                     "phone_number": self.faker.unique.phone_number(),
                     "fio_representative": self.faker.unique.name()
@@ -180,14 +180,14 @@ class Generator:
         self.faker = Faker("ru_RU")
 
         with open(file=MANUFACTURER_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
-            writer = csv.DictWriter(file, fieldnames=["id", "name", "address", "phone_number", "fio_representative"])
+            writer = csv.DictWriter(file, fieldnames=["id", "title", "address", "phone_number", "fio_representative"])
             writer.writeheader()
 
             for _ in range(num):
                 manufacturer_id = str(uuid.uuid4())
                 writer.writerow({
                     "id": manufacturer_id,
-                    "name": self.faker.company(),
+                    "title": self.faker.company(),
                     "address": self.faker.unique.address().replace("\n", ", "),
                     "phone_number": self.faker.unique.phone_number(),
                     "fio_representative": self.faker.unique.name()

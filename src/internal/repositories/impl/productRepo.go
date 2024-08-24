@@ -73,3 +73,18 @@ func (pr *ProductRepo) DeleteByID(ctx context.Context, ID uuid.UUID) error {
 
 	return nil
 }
+
+func (pr *ProductRepo) GetPage(ctx context.Context, limit, offset int) ([]*models.ProductModel, error) {
+	query := `select id, retailer_id, distributor_id, manufacturer_id, name, categories, brand, compound, gross_mass, net_mass, package_type from ss.product limit $1 offset $2`
+
+	var products []*models.ProductModel
+	err := pr.db.SelectContext(ctx, &products, query, limit, offset)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, errs.ErrProductDoesNotExists
+	}
+
+	return products, nil
+}

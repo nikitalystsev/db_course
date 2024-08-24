@@ -26,7 +26,7 @@ func NewHandler(
 	productService intf.IProductService,
 	//saleProductService intf.ISaleProductService,
 	//shopService intf.IShopService,
-	//supplierService intf.ISupplierService,
+	supplierService intf.ISupplierService,
 	userService intf.IUserService,
 	ratingService intf.IRatingService,
 	tokenManager auth.ITokenManager,
@@ -37,7 +37,7 @@ func NewHandler(
 		productService: productService,
 		//saleProductService: saleProductService,
 		//shopService:        shopService,
-		//supplierService:    supplierService,
+		supplierService: supplierService,
 		userService:     userService,
 		ratingService:   ratingService,
 		tokenManager:    tokenManager,
@@ -64,6 +64,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	guest := router.Group("/")
 	{
 		guest.GET("/products/:id", h.getProductByID)
+		guest.GET("/products", h.getProducts)
 	}
 
 	registered := router.Group("/techUI", h.userIdentity)

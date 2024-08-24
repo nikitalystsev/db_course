@@ -11,6 +11,7 @@ import (
 )
 
 const userMainMenu = `Главное меню:
+	1 -- 
 	0 -- выйти
 `
 
@@ -36,6 +37,7 @@ func (r *Requester) processUserActions() error {
 		switch menuItem {
 		case 0:
 			close(stopRefresh)
+			r.cache.Delete("tokens")
 			fmt.Printf("\n\nВы успешно вышли из системы!\n")
 			return nil
 		default:
@@ -137,7 +139,7 @@ func (r *Requester) Refreshing(interval time.Duration, stopRefresh <-chan struct
 		select {
 		case <-ticker.C:
 			if err := r.Refresh(); err != nil {
-				fmt.Printf("\n\nerror refreshing tokens: %v\n", err)
+				fmt.Printf("\n\nОшибка обновления токенов: %v\n", err)
 			}
 		case <-stopRefresh:
 			return

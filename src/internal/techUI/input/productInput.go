@@ -222,25 +222,27 @@ func CopiesNumber() (uint, error) {
 //	return params, nil
 //}
 //
-//func BookPagesNumber() (int, error) {
-//	reader := bufio.NewReader(os.Stdin)
-//
-//	fmt.Printf("Input book pages number: ")
-//
-//	numStr, err := reader.ReadString('\n')
-//	if err != nil {
-//		return 0, err
-//	}
-//
-//	numStr = strings.TrimSpace(numStr)
-//
-//	numInt, err := strconv.Atoi(numStr)
-//	if err != nil {
-//		return 0, err
-//	}
-//
-//	return numInt, nil
-//}
+
+func ProductPagesNumber() (int, error) {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Printf("Введите номер товара из каталога: ")
+
+	numStr, err := reader.ReadString('\n')
+	if err != nil {
+		return 0, err
+	}
+
+	numStr = strings.TrimSpace(numStr)
+
+	numInt, err := strconv.Atoi(numStr)
+	if err != nil {
+		return 0, err
+	}
+
+	return numInt, nil
+}
+
 //
 //func Book() (models.BookModel, error) {
 //	var book models.BookModel

@@ -66,3 +66,15 @@ func (ps *ProductService) DeleteByID(ctx context.Context, ID uuid.UUID) error {
 
 	return nil
 }
+
+func (ps *ProductService) GetPage(ctx context.Context, limit, offset int) ([]*models.ProductModel, error) {
+	products, err := ps.productRepo.GetPage(ctx, limit, offset)
+	if err != nil && !errors.Is(err, errs.ErrProductDoesNotExists) {
+		return nil, err
+	}
+	if products == nil {
+		return nil, errs.ErrProductDoesNotExists
+	}
+
+	return products, nil
+}
