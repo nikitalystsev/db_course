@@ -24,7 +24,7 @@ type Handler struct {
 
 func NewHandler(
 	productService intf.IProductService,
-	//saleProductService intf.ISaleProductService,
+	saleProductService intf.ISaleProductService,
 	//shopService intf.IShopService,
 	supplierService intf.ISupplierService,
 	userService intf.IUserService,
@@ -34,8 +34,8 @@ func NewHandler(
 	refreshTokenTTL time.Duration,
 ) *Handler {
 	return &Handler{
-		productService: productService,
-		//saleProductService: saleProductService,
+		productService:     productService,
+		saleProductService: saleProductService,
 		//shopService:        shopService,
 		supplierService: supplierService,
 		userService:     userService,
@@ -65,6 +65,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		guest.GET("/products/:id", h.getProductByID)
 		guest.GET("/products", h.getProducts)
+		guest.GET("/sales", h.getSalesByProductID)
 	}
 
 	registered := router.Group("/techUI", h.userIdentity)

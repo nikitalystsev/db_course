@@ -15,8 +15,8 @@ import (
 
 const catalogMenu = `Меню каталога:
 	1 -- Вывести товары
-	3 -- Вывести информацию о товаре
-	3 -- Перейти к каталогу товаров
+	2 -- Вывести информацию о товаре
+	3 -- Сравнить цену на товар
 	0 -- Вернуться в главное меню
 `
 const (
@@ -32,6 +32,7 @@ func (r *Requester) processCatalogActions() error {
 		err      error
 	)
 	r.cache.Set(productParamsKey, dto.ProductParamsDTO{Limit: pageLimit, Offset: 0})
+	r.cache.Set(productsKey, make([]uuid.UUID, 0))
 
 	for {
 		fmt.Printf("\n\n%s", catalogMenu)
@@ -48,6 +49,10 @@ func (r *Requester) processCatalogActions() error {
 			}
 		case 2:
 			if err = r.viewProduct(); err != nil {
+				fmt.Printf("\n\n%s\n", err.Error())
+			}
+		case 3:
+			if err = r.comparePriceOnProduct(); err != nil {
 				fmt.Printf("\n\n%s\n", err.Error())
 			}
 		case 0:
@@ -67,6 +72,9 @@ func (r *Requester) viewPage() error {
 	}
 
 	var productPagesID []uuid.UUID
+	if err := r.cache.Get(productsKey, &productPagesID); err != nil {
+		return err
+	}
 
 	request := HTTPRequest{
 		Method: http.MethodGet,
@@ -124,7 +132,7 @@ func (r *Requester) viewProduct() error {
 		return err
 	}
 
-	if num > len(products) || num < 0 {
+	if num > len(products)-1 || num < 0 { // num -- это индекс
 		return errors.New("номер товара выходит из диапазона выведенных значений")
 	}
 
@@ -154,11 +162,62 @@ func (r *Requester) viewProduct() error {
 
 	var product *dto.ProductDTO
 	if err = json.Unmarshal(response.Body, &product); err != nil {
-		fmt.Println("Ошибка тут")
 		return err
 	}
 
 	printProduct(product, num)
+
+	return nil
+}
+
+func (r *Requester) comparePriceOnProduct() error {
+	var products []uuid.UUID
+	if err := r.cache.Get(productsKey, &products); err != nil {
+		return err
+	}
+
+	num, err := input.ProductPagesNumber()
+	if err != nil {
+		return err
+	}
+
+	if num > len(products)-1 || num < 0 { // num -- это индекс
+		return errors.New("номер товара выходит из диапазона выведенных значений")
+	}
+
+	productID := products[num]
+
+	request := HTTPRequest{
+		Method: http.MethodGet,
+		URL:    r.baseURL + "/sales",
+		Headers: map[string]string{
+			"Content-Type": "application/json",
+		},
+		QueryParams: map[string]string{
+			"product_id": productID.String(),
+		},
+		Timeout: 10 * time.Second,
+	}
+
+	response, err := SendRequest(request)
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		var info string
+		if err = json.Unmarshal(response.Body, &info); err != nil {
+			return err
+		}
+		return errors.New(info)
+	}
+
+	var sales []*models.SaleProductModel
+	if err = json.Unmarshal(response.Body, &sales); err != nil {
+		return err
+	}
+
+	printSales(sales)
 
 	return nil
 }
@@ -202,4 +261,16 @@ func printProduct(product *dto.ProductDTO, num int) {
 	fmt.Printf("Gross Mass:     %.2f\n", product.GrossMass)
 	fmt.Printf("Net Mass:       %.2f\n", product.NetMass)
 	fmt.Printf("Package Type:   %s\n", product.PackageType)
+}
+
+func printSales(sales []*models.SaleProductModel) {
+	titleWidth := 60
+	authorWidth := 60
+
+	fmt.Printf("\n\n%-5s %-60s %-60s\n", "No.", "Цена товара", "Валюта")
+	fmt.Println(strings.Repeat("-", 5+1+titleWidth+1+authorWidth))
+
+	for i, saleProduct := range sales {
+		fmt.Printf("%-5d %-60s %-60s\n", i, truncate(fmt.Sprintf("%f", saleProduct.Price), titleWidth), truncate(saleProduct.Currency, authorWidth))
+	}
 }

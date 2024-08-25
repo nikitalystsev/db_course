@@ -6,7 +6,6 @@ import (
 	"SmartShopper-services/errs"
 	"context"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
@@ -30,8 +29,6 @@ func (h *Handler) getProductByID(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	fmt.Printf("retailer id: %s\n", product.RetailerID)
 
 	retailer, err := h.getRetailer(product.RetailerID)
 	if err != nil && errors.Is(err, errs.ErrRetailerDoesNotExists) {
@@ -112,6 +109,31 @@ func (h *Handler) getProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, products)
 }
 
+func (h *Handler) getSalesByProductID(c *gin.Context) {
+	productIDStr := c.Query("product_id")
+	if productIDStr == "" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "invalid parameter")
+		return
+	}
+
+	productID, err := uuid.Parse(productIDStr)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "invalid product_id")
+		return
+	}
+
+	sales, err := h.saleProductService.GetByProductID(c.Request.Context(), productID)
+	if err != nil && errors.Is(err, errs.ErrSaleProductDoesNotExists) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
+		return
+	}
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, sales)
+}
 func (h *Handler) getRetailer(retailerID uuid.UUID) (*models.SupplierModel, error) {
 	retailer, err := h.supplierService.GetRetailerByID(context.Background(), retailerID)
 	if err != nil {

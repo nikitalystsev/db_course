@@ -21,10 +21,11 @@ func Run(configDir string) {
 	}
 
 	var (
-		userRepo     intfRepo.IUserRepo
-		productRepo  intfRepo.IProductRepo
-		ratingRepo   intfRepo.IRatingRepo
-		supplierRepo intfRepo.ISupplierRepo
+		userRepo        intfRepo.IUserRepo
+		productRepo     intfRepo.IProductRepo
+		ratingRepo      intfRepo.IRatingRepo
+		supplierRepo    intfRepo.ISupplierRepo
+		saleProductRepo intfRepo.ISaleProductRepo
 	)
 
 	client := redis.NewClient(&redis.Options{
@@ -50,6 +51,7 @@ func Run(configDir string) {
 	productRepo = impl.NewProductRepo(db)
 	ratingRepo = impl.NewRatingRepo(db)
 	supplierRepo = impl.NewSupplierRepo(db)
+	saleProductRepo = impl.NewSaleProductRepo(db)
 
 	tokenManager, err := auth.NewTokenManager(cfg.Auth.JWT.SigningKey)
 	if err != nil {
@@ -69,9 +71,11 @@ func Run(configDir string) {
 	productService := implServices.NewProductService(productRepo)
 	ratingService := implServices.NewRatingService(ratingRepo)
 	supplierService := implServices.NewSupplierService(supplierRepo)
+	saleProductService := implServices.NewSaleProductService(saleProductRepo)
 
 	handler := handlers.NewHandler(
 		productService,
+		saleProductService,
 		supplierService,
 		userService,
 		ratingService,

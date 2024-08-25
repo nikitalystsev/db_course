@@ -194,7 +194,65 @@ class Generator:
                 })
                 self.manufacturer_ids.append(manufacturer_id)
 
-    def shops_to_csv(self, num: int):
+    def retailer_distributor_to_csv(self, num: int):
+        """
+        Метод для генерации продаж товаров
+        """
+        if not self.retailer_ids or not self.distributor_ids:
+            print("Нет либо ритейлеров, либо дистрибьюторов")
+            return
+
+        unique_pairs = set()
+
+        while len(unique_pairs) < num:
+            retailer_id = random.choice(self.retailer_ids)
+            distributor_id = random.choice(self.distributor_ids)
+
+            unique_pairs.add((retailer_id, distributor_id))
+
+        with open(file=RETAILER_DISTRIBUTOR_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(
+                file,
+                fieldnames=["retailer_id", "distributor_id"]
+            )
+            writer.writeheader()
+
+            for retailer_id, distributor_id in unique_pairs:
+                writer.writerow({
+                    "retailer_id": retailer_id,
+                    "distributor_id": distributor_id
+                })
+
+    def distributor_manufacturer_to_csv(self, num: int):
+        """
+        Метод для генерации продаж товаров
+        """
+        if not self.distributor_ids or not self.manufacturer_ids:
+            print("Нет либо дистрибьюторов, либо производителей")
+            return
+
+        unique_pairs = set()
+
+        while len(unique_pairs) < num:
+            distributor_id = random.choice(self.distributor_ids)
+            manufacturer_id = random.choice(self.manufacturer_ids)
+
+            unique_pairs.add((distributor_id, manufacturer_id))
+
+        with open(file=DISTRIBUTOR_MANUFACTURER_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(
+                file,
+                fieldnames=["distributor_id", "manufacturer_id"]
+            )
+            writer.writeheader()
+
+            for distributor_id, manufacturer_id in unique_pairs:
+                writer.writerow({
+                    "distributor_id": distributor_id,
+                    "manufacturer_id": manufacturer_id
+                })
+
+    def shops_to_csv(self):
         """
         Метод для генерации магазинов
         """
@@ -217,11 +275,18 @@ class Generator:
 
         self.faker = Faker("ru_RU")
 
-        cnt = 1
+        # Перемешиваем список ритейлеров
+        shuffled_retailers = random.sample(self.retailer_ids, len(self.retailer_ids))
+        retailer_count = len(shuffled_retailers)
+        cnt = 0
 
         for row in reader:
+            if row['Название'] is None or row['Название'] == "":
+                continue
+
             shop_id = str(uuid.uuid4())
-            retailer_id = random.choice(self.retailer_ids)
+            # Выбираем ритейлера по индексу, циклически
+            retailer_id = shuffled_retailers[cnt % retailer_count]
 
             writer.writerow({
                 "id": shop_id,
@@ -233,9 +298,6 @@ class Generator:
             })
             self.shop_retailer_ids.append((shop_id, retailer_id))
             cnt += 1
-
-            if cnt >= num:
-                break
 
         shop_file.close()
         parse_file.close()
@@ -372,9 +434,24 @@ class Generator:
         self.sale_product_ids.clear()
 
         unique_pairs = set()
+        prev_len = 0
+        unchanged_count = 0  # Счетчик неизменных итераций
+        max_unchanged_iterations = 500  # Максимальное количество неизменных итераций
 
         while len(unique_pairs) < num:
             unique_pairs.add(self.__get_random_shop_and_product_by_retailer())
+            curr_len = len(unique_pairs)
+            print(f"len(unique_pairs) = {len(unique_pairs)}")
+            if curr_len == prev_len:
+                unchanged_count += 1
+            else:
+                unchanged_count = 0  # Сброс счетчика, если длина изменилась
+
+            if unchanged_count >= max_unchanged_iterations:
+                print("Длина unique_pairs не меняется слишком долго.")
+                break
+
+            prev_len = curr_len
 
         with open(file=SALE_PRODUCT_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.DictWriter(
@@ -397,64 +474,6 @@ class Generator:
                     "avg_rating": None,
                 })
                 self.sale_product_ids.append(sale_product_id)
-
-    def retailer_distributor_to_csv(self, num: int):
-        """
-        Метод для генерации продаж товаров
-        """
-        if not self.retailer_ids or not self.distributor_ids:
-            print("Нет либо ритейлеров, либо дистрибьюторов")
-            return
-
-        unique_pairs = set()
-
-        while len(unique_pairs) < num:
-            retailer_id = random.choice(self.retailer_ids)
-            distributor_id = random.choice(self.distributor_ids)
-
-            unique_pairs.add((retailer_id, distributor_id))
-
-        with open(file=RETAILER_DISTRIBUTOR_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
-            writer = csv.DictWriter(
-                file,
-                fieldnames=["retailer_id", "distributor_id"]
-            )
-            writer.writeheader()
-
-            for retailer_id, distributor_id in unique_pairs:
-                writer.writerow({
-                    "retailer_id": retailer_id,
-                    "distributor_id": distributor_id
-                })
-
-    def distributor_manufacturer_to_csv(self, num: int):
-        """
-        Метод для генерации продаж товаров
-        """
-        if not self.distributor_ids or not self.manufacturer_ids:
-            print("Нет либо дистрибьюторов, либо производителей")
-            return
-
-        unique_pairs = set()
-
-        while len(unique_pairs) < num:
-            distributor_id = random.choice(self.distributor_ids)
-            manufacturer_id = random.choice(self.manufacturer_ids)
-
-            unique_pairs.add((distributor_id, manufacturer_id))
-
-        with open(file=DISTRIBUTOR_MANUFACTURER_DATA_PATH, mode='w', newline='', encoding='utf-8') as file:
-            writer = csv.DictWriter(
-                file,
-                fieldnames=["distributor_id", "manufacturer_id"]
-            )
-            writer.writeheader()
-
-            for distributor_id, manufacturer_id in unique_pairs:
-                writer.writerow({
-                    "distributor_id": distributor_id,
-                    "manufacturer_id": manufacturer_id
-                })
 
     @staticmethod
     def __get_product_name_by_category(category: str, food_faker: Food):
@@ -644,6 +663,8 @@ class Generator:
 
             if shop_id[1] == product_id[1]:
                 break
+        # shop_id = random.choice(self.shop_retailer_ids)
+        # product_id = random.choice(self.product_retailer_ids)
 
         return shop_id[0], product_id[0]
 
