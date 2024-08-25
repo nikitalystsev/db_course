@@ -3,6 +3,6 @@ package errs
 import "errors"
 
 var (
-	ErrShopAlreadyExist  = errors.New("[!] shopService error! Shop already exists")
-	ErrShopDoesNotExists = errors.New("[!] shopService error! Shop does not exist")
+	ErrShopAlreadyExist  = errors.New("ошибка shopService! Магазин уже существует")
+	ErrShopDoesNotExists = errors.New("ошибка shopService! Магазина не существует")
 )

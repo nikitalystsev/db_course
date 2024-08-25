@@ -8,8 +8,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -217,28 +218,22 @@ func (r *Requester) comparePriceOnProduct() error {
 		return err
 	}
 
-	printSales(sales)
+	printSales(sales, num)
 
 	return nil
 }
 
 func printProducts(products []*models.ProductModel, offset int) {
-	titleWidth := 60
-	authorWidth := 60
-
-	fmt.Printf("\n\n%-5s %-60s %-60s\n", "No.", "Название товара", "Категория")
-	fmt.Println(strings.Repeat("-", 5+1+titleWidth+1+authorWidth))
+	t := table.NewWriter()
+	t.SetTitle(fmt.Sprintf("Страница товаров №%d", offset/pageLimit+1))
+	t.SetStyle(table.StyleBold)
+	t.Style().Format.Header = text.FormatTitle
+	t.AppendHeader(table.Row{"No.", "Название товара", "Категория"})
 
 	for i, product := range products {
-		fmt.Printf("%-5d %-60s %-60s\n", offset+i, truncate(product.Name, titleWidth), truncate(product.Categories, authorWidth))
+		t.AppendRow(table.Row{offset + i, product.Name, product.Categories})
 	}
-}
-
-func truncate(s string, maxLength int) string {
-	if len(s) > maxLength {
-		return s[:maxLength-3] + "..."
-	}
-	return s
+	fmt.Println(t.Render())
 }
 
 func copyProductIDsToArray(productIDs *[]uuid.UUID, products []*models.ProductModel) {
@@ -247,30 +242,36 @@ func copyProductIDsToArray(productIDs *[]uuid.UUID, products []*models.ProductMo
 	}
 }
 
-// Функция для вывода информации о продукте
 func printProduct(product *dto.ProductDTO, num int) {
-	fmt.Printf("\n\nProduct №%d:\n", num)
-	fmt.Println(strings.Repeat("-", 150))
-	fmt.Printf("Retailer:       %s\n", product.Retailer)
-	fmt.Printf("Distributor:    %s\n", product.Distributor)
-	fmt.Printf("Manufacturer:   %s\n", product.Manufacturer)
-	fmt.Printf("Name:           %s\n", product.Name)
-	fmt.Printf("Categories:     %s\n", product.Categories)
-	fmt.Printf("Brand:          %s\n", product.Brand)
-	fmt.Printf("Compound:       %s\n", product.Compound)
-	fmt.Printf("Gross Mass:     %.2f\n", product.GrossMass)
-	fmt.Printf("Net Mass:       %.2f\n", product.NetMass)
-	fmt.Printf("Package Type:   %s\n", product.PackageType)
+	t := table.NewWriter()
+	t.SetTitle(fmt.Sprintf("Товар №%d", num))
+	t.SetStyle(table.StyleBold)
+	t.Style().Format.Header = text.FormatTitle
+
+	t.AppendRow(table.Row{"Ритейлер", product.Retailer})
+	t.AppendRow(table.Row{"Дистрибьютор", product.Distributor})
+	t.AppendRow(table.Row{"Производитель", product.Manufacturer})
+	t.AppendRow(table.Row{"Название", product.Name})
+	t.AppendRow(table.Row{"Категория", product.Categories})
+	t.AppendRow(table.Row{"Бренд", product.Brand})
+	t.AppendRow(table.Row{"Состав", product.Compound})
+	t.AppendRow(table.Row{"Масса брутто", product.GrossMass})
+	t.AppendRow(table.Row{"Масса нетто", product.NetMass})
+	t.AppendRow(table.Row{"Тип упаковки", product.PackageType})
+
+	fmt.Println(t.Render())
 }
 
-func printSales(sales []*models.SaleProductModel) {
-	titleWidth := 60
-	authorWidth := 60
-
-	fmt.Printf("\n\n%-5s %-60s %-60s\n", "No.", "Цена товара", "Валюта")
-	fmt.Println(strings.Repeat("-", 5+1+titleWidth+1+authorWidth))
+func printSales(sales []*models.SaleProductModel, num int) {
+	t := table.NewWriter()
+	t.SetTitle(fmt.Sprintf("Места продажи товара №%d", num))
+	t.SetStyle(table.StyleBold)
+	t.Style().Format.Header = text.FormatTitle
+	t.AppendHeader(table.Row{"No.", "Цена товара", "Валюта"})
 
 	for i, saleProduct := range sales {
-		fmt.Printf("%-5d %-60s %-60s\n", i, truncate(fmt.Sprintf("%f", saleProduct.Price), titleWidth), truncate(saleProduct.Currency, authorWidth))
+		t.AppendRow(table.Row{i, saleProduct.Price, saleProduct.Currency})
 	}
+
+	fmt.Println(t.Render())
 }

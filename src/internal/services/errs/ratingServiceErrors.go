@@ -3,6 +3,6 @@ package errs
 import "errors"
 
 var (
-	ErrRatingAlreadyExist  = errors.New("[!] RatingService error! Rating already exists")
-	ErrRatingDoesNotExists = errors.New("[!] RatingService error! Rating does not exist")
+	ErrRatingAlreadyExist  = errors.New("ошибка ratingService! Оценка уже существует")
+	ErrRatingDoesNotExists = errors.New("ошибка ratingService! Оценки не существует")
 )

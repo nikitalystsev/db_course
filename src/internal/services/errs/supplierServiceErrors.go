@@ -3,10 +3,10 @@ package errs
 import "errors"
 
 var (
-	ErrRetailerAlreadyExist      = errors.New("[!] supplierService error! Retailer already exists")
-	ErrRetailerDoesNotExists     = errors.New("[!] supplierService error! Retailer does not exist")
-	ErrDistributorAlreadyExist   = errors.New("[!] supplierService error! Distributor already exists")
-	ErrDistributorDoesNotExists  = errors.New("[!] supplierService error! Distributor does not exist")
-	ErrManufacturerAlreadyExist  = errors.New("[!] supplierService error! Manufacturer already exists")
-	ErrManufacturerDoesNotExists = errors.New("[!] supplierService error! Manufacturer does not exist")
+	ErrRetailerAlreadyExist      = errors.New("ошибка supplierService! Ритейлер уже существует")
+	ErrRetailerDoesNotExists     = errors.New("ошибка supplierService! Ритейлера не существует")
+	ErrDistributorAlreadyExist   = errors.New("ошибка supplierService! Дистрибьютор уже существует")
+	ErrDistributorDoesNotExists  = errors.New("ошибка supplierService! Дистрибьютора не существует")
+	ErrManufacturerAlreadyExist  = errors.New("ошибка supplierService! Производитель уже существует")
+	ErrManufacturerDoesNotExists = errors.New("ошибка supplierService! Производителя не существует")
 )
