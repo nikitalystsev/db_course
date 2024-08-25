@@ -6,7 +6,6 @@ import (
 	"SmartShopper-services/errs"
 	"context"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
@@ -132,8 +131,6 @@ func (h *Handler) getSalesByProductID(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	fmt.Println("Тут не паникуем")
 	salesDTO, err := h.copySalesToDTO(sales)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
@@ -141,6 +138,31 @@ func (h *Handler) getSalesByProductID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, salesDTO)
+}
+
+func (h *Handler) getCertificatesByProductID(c *gin.Context) {
+	productIDStr := c.Query("product_id")
+	if productIDStr == "" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "invalid parameter")
+		return
+	}
+
+	productID, err := uuid.Parse(productIDStr)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "invalid product_id")
+		return
+	}
+
+	certificates, err := h.certificateService.GetByProductID(c.Request.Context(), productID)
+	if err != nil && errors.Is(err, errs.ErrCertificateDoesNotExists) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
+		return
+	}
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, certificates)
 }
 
 func (h *Handler) getRetailerByID(retailerID uuid.UUID) (*models.SupplierModel, error) {
@@ -193,17 +215,13 @@ func (h *Handler) getPromotionByID(promotionID uuid.UUID) (*models.PromotionMode
 }
 
 func (h *Handler) copySalesToDTO(sales []*models.SaleProductModel) ([]*dto.SaleProductDTO, error) {
-	fmt.Println("call copySalesToDTO")
-
 	var salesDTO []*dto.SaleProductDTO
 
 	for _, saleProduct := range sales {
-		fmt.Println("Тут тоже не паникуем. Пытаемся скопировать очередной элемент")
 		saleDTO, err := h.copySaleToDTO(saleProduct)
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println("успешно скопирован очередной элемент")
 		salesDTO = append(salesDTO, saleDTO)
 	}
 
@@ -211,27 +229,18 @@ func (h *Handler) copySalesToDTO(sales []*models.SaleProductModel) ([]*dto.SaleP
 }
 
 func (h *Handler) copySaleToDTO(sale *models.SaleProductModel) (*dto.SaleProductDTO, error) {
-	fmt.Println("call copySaleToDTO")
-
 	shop, err := h.getShopByID(sale.ShopID)
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println("Тут не паникуем. Получили магазин")
-
 	var saleProduct dto.SaleProductDTO
 	saleProduct.ShopTitle = shop.Title
 	saleProduct.ShopAddress = shop.Address
-
-	fmt.Println("Тут не паникуем. заполнили магазин")
 
 	promotion, err := h.getPromotionByID(sale.PromotionID)
 	if err != nil && !errors.Is(err, errs.ErrPromotionDoesNotExists) {
 		return nil, err
 	}
-
-	fmt.Println("Не запаниковали. получили акцию")
 
 	if promotion == nil {
 		saleProduct.PromotionType = "Нет акции"
@@ -242,8 +251,6 @@ func (h *Handler) copySaleToDTO(sale *models.SaleProductModel) (*dto.SaleProduct
 		saleProduct.PromotionDescription = promotion.Description
 		saleProduct.PromotionDiscountSize = &promotion.DiscountSize
 	}
-
-	fmt.Println("Не запаниковали. заполняем остатки")
 
 	saleProduct.Price = sale.Price
 	saleProduct.Currency = sale.Currency

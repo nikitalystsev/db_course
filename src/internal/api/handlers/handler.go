@@ -18,6 +18,7 @@ type Handler struct {
 	supplierService    intf.ISupplierService
 	userService        intf.IUserService
 	ratingService      intf.IRatingService
+	certificateService intf.ICertificateService
 	tokenManager       auth.ITokenManager
 	accessTokenTTL     time.Duration
 	refreshTokenTTL    time.Duration
@@ -31,6 +32,7 @@ func NewHandler(
 	supplierService intf.ISupplierService,
 	userService intf.IUserService,
 	ratingService intf.IRatingService,
+	certificateService intf.ICertificateService,
 	tokenManager auth.ITokenManager,
 	accessTokenTTL time.Duration,
 	refreshTokenTTL time.Duration,
@@ -43,6 +45,7 @@ func NewHandler(
 		supplierService:    supplierService,
 		userService:        userService,
 		ratingService:      ratingService,
+		certificateService: certificateService,
 		tokenManager:       tokenManager,
 		accessTokenTTL:     accessTokenTTL,
 		refreshTokenTTL:    refreshTokenTTL,
@@ -69,6 +72,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		guest.GET("/products/:id", h.getProductByID)
 		guest.GET("/products", h.getProducts)
 		guest.GET("/sales", h.getSalesByProductID)
+		guest.GET("/certificates", h.getCertificatesByProductID)
 	}
 
 	registered := router.Group("/techUI", h.userIdentity)

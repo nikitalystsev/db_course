@@ -60,9 +60,9 @@ alter table if exists ss.certificate_compliance
     alter column number set not null,
     alter column normative_document set not null,
     alter column status_compliance set not null,
-    alter column registration_data set not null,
-    alter column expiration_data set not null,
-    add check (registration_data < expiration_data);
+    alter column registration_date set not null,
+    alter column expiration_date set not null,
+    add check (registration_date < expiration_date);
 
 alter table ss.user
     alter column id set not null,

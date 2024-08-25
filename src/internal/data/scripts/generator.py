@@ -374,8 +374,8 @@ class Generator:
                     "number",
                     "normative_document",
                     "status_compliance",
-                    "registration_data",
-                    "expiration_data"
+                    "registration_date",
+                    "expiration_date"
                 ]
             )
             writer.writeheader()
@@ -392,8 +392,8 @@ class Generator:
                     "number": self.__get_certificate_number_by_type(certificate_type),
                     "normative_document": random.choice(CERTIFICATE_COMPLIANCE_NORMATIVE_DOCUMENTS),
                     "status_compliance": True,
-                    "registration_data": dates[1],
-                    "expiration_data": dates[0]
+                    "registration_date": dates[1],
+                    "expiration_date": dates[0]
                 })
 
     def promotions_to_csv(self, num: int):
@@ -523,7 +523,7 @@ class Generator:
         """
         segments = []
 
-        for _ in range(8):  # Всего 8 сегментов
+        for _ in range(4):  # Всего 8 сегментов
             # Генерируем сегмент: 4 символа (буквы и цифры) + 4 цифры
             segment = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
             segment += '-' + ''.join(random.choices(string.digits, k=4))

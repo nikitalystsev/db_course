@@ -28,6 +28,7 @@ func Run(configDir string) {
 		saleProductRepo intfRepo.ISaleProductRepo
 		promotionRepo   intfRepo.IPromotionRepo
 		shopRepo        intfRepo.IShopRepo
+		certificateRepo intfRepo.ICertificateRepo
 	)
 
 	client := redis.NewClient(&redis.Options{
@@ -56,6 +57,7 @@ func Run(configDir string) {
 	saleProductRepo = impl.NewSaleProductRepo(db)
 	promotionRepo = impl.NewPromotionRepo(db)
 	shopRepo = impl.NewShopRepo(db)
+	certificateRepo = impl.NewCertificateRepo(db)
 
 	tokenManager, err := auth.NewTokenManager(cfg.Auth.JWT.SigningKey)
 	if err != nil {
@@ -78,6 +80,7 @@ func Run(configDir string) {
 	saleProductService := implServices.NewSaleProductService(saleProductRepo)
 	promotionService := implServices.NewPromotionService(promotionRepo)
 	shopService := implServices.NewShopService(shopRepo)
+	certificateService := implServices.NewCertificateService(certificateRepo)
 
 	handler := handlers.NewHandler(
 		productService,
@@ -87,6 +90,7 @@ func Run(configDir string) {
 		supplierService,
 		userService,
 		ratingService,
+		certificateService,
 		tokenManager,
 		cfg.Auth.JWT.AccessTokenTTL,
 		cfg.Auth.JWT.RefreshTokenTTL,

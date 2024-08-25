@@ -65,8 +65,8 @@ create table if not exists ss.certificate_compliance
     number             text,
     normative_document text,
     status_compliance  boolean,
-    registration_data  date,
-    expiration_data    date,
+    registration_date  date,
+    expiration_date    date,
     foreign key (product_id) references product (id) on delete cascade on update cascade
 );
 
