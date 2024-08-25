@@ -6,14 +6,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"net/http"
 	"time"
 )
 
 const userMainMenu = `Главное меню:
-	1 -- 
+	1 -- Перейти в каталог товаров
+	2 -- Добавить новый магазин
 	0 -- выйти
 `
+const tokensKey = "tokens"
 
 func (r *Requester) processUserActions() error {
 	var (
@@ -35,6 +38,14 @@ func (r *Requester) processUserActions() error {
 		}
 
 		switch menuItem {
+		case 1:
+			if err = r.processCatalogActions(); err != nil {
+				fmt.Printf("\n\n%s\n", err.Error())
+			}
+		case 2:
+			if err = r.addNewShop(); err != nil {
+				fmt.Printf("\n\n%s\n", err.Error())
+			}
 		case 0:
 			close(stopRefresh)
 			r.cache.Delete("tokens")
@@ -47,7 +58,136 @@ func (r *Requester) processUserActions() error {
 	}
 
 }
+func (r *Requester) addNewShop() error {
+	var tokens dto.UserTokensDTO
+	if err := r.cache.Get(tokensKey, &tokens); err != nil {
+		return err
+	}
+	retailerID, err := r.addNewRetailerIfNotExist(tokens)
+	if err != nil {
+		return err
+	}
 
+	shopDTO, err := input.ShopParams()
+	if err != nil {
+		return err
+	}
+
+	shopDTO.RetailerID = retailerID
+
+	request := HTTPRequest{
+		Method: http.MethodPost,
+		URL:    r.baseURL + "/api/shops",
+		Headers: map[string]string{
+			"Content-Type":  "application/json",
+			"Authorization": fmt.Sprintf("Bearer %s", tokens.AccessToken),
+		},
+		Body:    shopDTO,
+		Timeout: 10 * time.Second,
+	}
+
+	response, err := SendRequest(request)
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		var info string
+		if err = json.Unmarshal(response.Body, &info); err != nil {
+			return err
+		}
+		return errors.New(info)
+	}
+
+	fmt.Printf("\n\nМагазин был успешно добавлен!\n")
+
+	return nil
+}
+
+func (r *Requester) addNewRetailerIfNotExist(tokens dto.UserTokensDTO) (uuid.UUID, error) {
+	fmt.Printf("\n\nДля добавления нового магазина необходимо ввести " +
+		"данные Ритейлера, с которым он сотрудничает\n")
+
+	retailerDTO, err := input.RetailerParams()
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	request := HTTPRequest{
+		Method: http.MethodPost,
+		URL:    r.baseURL + "/api/retailers",
+		Headers: map[string]string{
+			"Content-Type":  "application/json",
+			"Authorization": fmt.Sprintf("Bearer %s", tokens.AccessToken),
+		},
+		Body:    retailerDTO,
+		Timeout: 10 * time.Second,
+	}
+
+	response, err := SendRequest(request)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	if response.StatusCode == http.StatusConflict {
+		var retailerID uuid.UUID
+		retailerID, err = r.getRetailerByAddress(tokens, retailerDTO.Address)
+		if err != nil {
+			return uuid.Nil, err
+		}
+		return retailerID, nil
+	}
+
+	if response.StatusCode == http.StatusInternalServerError || response.StatusCode == http.StatusBadRequest {
+		var info string
+		if err = json.Unmarshal(response.Body, &info); err != nil {
+			return uuid.Nil, err
+		}
+		return uuid.Nil, errors.New(info)
+	}
+
+	var retailerID uuid.UUID
+	if err = json.Unmarshal(response.Body, &retailerID); err != nil {
+		return uuid.Nil, err
+	}
+
+	return retailerID, nil
+}
+
+func (r *Requester) getRetailerByAddress(tokens dto.UserTokensDTO, address string) (uuid.UUID, error) {
+	request := HTTPRequest{
+		Method: http.MethodGet,
+		URL:    r.baseURL + "/api/retailers",
+		Headers: map[string]string{
+			"Content-Type":  "application/json",
+			"Authorization": fmt.Sprintf("Bearer %s", tokens.AccessToken),
+		},
+		QueryParams: map[string]string{
+			"address": address,
+		},
+		Timeout: 10 * time.Second,
+	}
+
+	response, err := SendRequest(request)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		var info string
+		if err = json.Unmarshal(response.Body, &info); err != nil {
+			return uuid.Nil, err
+		}
+		return uuid.Nil, errors.New(info)
+	}
+
+	var retailerID uuid.UUID
+	if err = json.Unmarshal(response.Body, &retailerID); err != nil {
+		return uuid.Nil, err
+	}
+
+	return retailerID, nil
+}
 func (r *Requester) signIn(stopRefresh <-chan struct{}) error {
 	readerSignInDTO, err := input.SignInParams()
 	if err != nil {
@@ -77,7 +217,7 @@ func (r *Requester) signIn(stopRefresh <-chan struct{}) error {
 		return errors.New(info)
 	}
 
-	var tokens dto.ReaderTokensDTO
+	var tokens dto.UserTokensDTO
 	if err = json.Unmarshal(response.Body, &tokens); err != nil {
 		return err
 	}
@@ -92,7 +232,7 @@ func (r *Requester) signIn(stopRefresh <-chan struct{}) error {
 }
 
 func (r *Requester) Refresh() error {
-	var tokens dto.ReaderTokensDTO
+	var tokens dto.UserTokensDTO
 	if err := r.cache.Get("tokens", &tokens); err != nil {
 		return err
 	}

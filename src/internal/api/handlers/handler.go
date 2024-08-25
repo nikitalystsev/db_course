@@ -75,9 +75,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		guest.GET("/certificates", h.getCertificatesByProductID)
 	}
 
-	registered := router.Group("/techUI", h.userIdentity)
+	registered := router.Group("/api", h.userIdentity)
 	{
 		registered.POST("/ratings", h.addSaleProductRating)
+		registered.POST("/retailers", h.addRetailerIfNotExist)
+		registered.GET("/retailers", h.getRetailerByAddress)
+		registered.POST("/shops", h.addShop)
 	}
 	return router
 }

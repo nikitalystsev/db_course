@@ -6,6 +6,7 @@ import (
 	"SmartShopper-services/intfRepo"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 )
 
@@ -18,6 +19,8 @@ func NewShopService(shopRepo intfRepo.IShopRepo) *ShopService {
 }
 
 func (ss *ShopService) Create(ctx context.Context, shop *models.ShopModel) error {
+	fmt.Println("call shopRepo.Create")
+
 	existingShop, err := ss.shopRepo.GetByAddress(ctx, shop.Address)
 	if err != nil && !errors.Is(err, errs.ErrShopDoesNotExists) {
 		return err
@@ -26,6 +29,8 @@ func (ss *ShopService) Create(ctx context.Context, shop *models.ShopModel) error
 	if existingShop != nil {
 		return errs.ErrShopAlreadyExist
 	}
+
+	fmt.Println("Все тип топ. Магазина еще не создавали")
 
 	err = ss.shopRepo.Create(ctx, shop)
 	if err != nil {

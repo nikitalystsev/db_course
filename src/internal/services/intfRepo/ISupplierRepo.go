@@ -18,4 +18,6 @@ type ISupplierRepo interface {
 	DeleteRetailerByID(ctx context.Context, retailerID uuid.UUID) error
 	DeleteDistributorByID(ctx context.Context, distributorID uuid.UUID) error
 	DeleteManufacturerByID(ctx context.Context, manufacturerID uuid.UUID) error
+
+	GetRetailerByAddress(ctx context.Context, retailerAddress string) (*models.SupplierModel, error)
 }

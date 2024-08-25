@@ -72,13 +72,88 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.ReaderTokensDTO{
+	c.JSON(http.StatusOK, dto.UserTokensDTO{
 		AccessToken:  res.AccessToken,
 		RefreshToken: res.RefreshToken,
 		ExpiredAt:    time.Now().Add(h.accessTokenTTL).UnixMilli(),
 	})
 }
 
+func (h *Handler) addRetailerIfNotExist(c *gin.Context) {
+	var retailerDTO dto.SupplierDTO
+	if err := c.BindJSON(&retailerDTO); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	retailer := &models.SupplierModel{
+		ID:                uuid.New(),
+		Title:             retailerDTO.Title,
+		Address:           retailerDTO.Address,
+		PhoneNumber:       retailerDTO.PhoneNumber,
+		FioRepresentative: retailerDTO.FioRepresentative,
+	}
+
+	err := h.supplierService.CreateRetailer(c.Request.Context(), retailer)
+	if err != nil && errors.Is(err, errs.ErrRetailerAlreadyExist) {
+		c.AbortWithStatusJSON(http.StatusConflict, err.Error())
+		return
+	}
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, retailer.ID)
+}
+
+func (h *Handler) getRetailerByAddress(c *gin.Context) {
+	address := c.Query("address")
+
+	retailer, err := h.supplierService.GetRetailerByAddress(c.Request.Context(), address)
+	if err != nil && errors.Is(err, errs.ErrRetailerDoesNotExists) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
+		return
+	}
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, retailer.ID)
+}
+
+func (h *Handler) addShop(c *gin.Context) {
+	var shopDTO dto.ShopDTO
+	if err := c.BindJSON(&shopDTO); err != nil {
+		fmt.Println("Ебаная ошибка тут")
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	shop := &models.ShopModel{
+		ID:          uuid.New(),
+		RetailerID:  shopDTO.RetailerID,
+		Title:       shopDTO.Title,
+		Address:     shopDTO.Address,
+		PhoneNumber: shopDTO.PhoneNumber,
+		FioDirector: shopDTO.FioDirector,
+	}
+
+	err := h.shopService.Create(c.Request.Context(), shop)
+	if err != nil && errors.Is(err, errs.ErrShopAlreadyExist) {
+		fmt.Println("Ошибка тут StatusConflict")
+		c.AbortWithStatusJSON(http.StatusConflict, err.Error())
+		return
+	}
+	if err != nil {
+		fmt.Println("Ошибка тут StatusInternalServerError")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
 func (h *Handler) refresh(c *gin.Context) {
 	var inp string
 	if err := c.BindJSON(&inp); err != nil {
@@ -96,7 +171,7 @@ func (h *Handler) refresh(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.ReaderTokensDTO{
+	c.JSON(http.StatusOK, dto.UserTokensDTO{
 		AccessToken:  res.AccessToken,
 		RefreshToken: res.RefreshToken,
 		ExpiredAt:    time.Now().Add(h.accessTokenTTL).UnixMilli(),

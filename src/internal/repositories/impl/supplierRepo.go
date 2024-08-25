@@ -177,3 +177,19 @@ func (sr *SupplierRepo) DeleteManufacturerByID(ctx context.Context, manufacturer
 
 	return nil
 }
+
+func (sr *SupplierRepo) GetRetailerByAddress(ctx context.Context, retailerAddress string) (*models.SupplierModel, error) {
+	query := `select id, title, address, phone_number, fio_representative from ss.retailer where address = $1`
+
+	var retailer models.SupplierModel
+	err := sr.db.GetContext(ctx, &retailer, query, retailerAddress)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, errs.ErrRetailerDoesNotExists
+	}
+
+	return &retailer, nil
+}

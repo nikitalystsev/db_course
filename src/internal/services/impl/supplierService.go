@@ -19,7 +19,7 @@ func NewSupplierService(supplierRepo intfRepo.ISupplierRepo) intf.ISupplierServi
 }
 
 func (ss *SupplierService) CreateRetailer(ctx context.Context, retailer *models.SupplierModel) error {
-	existingRetailer, err := ss.supplierRepo.GetRetailerByID(ctx, retailer.ID)
+	existingRetailer, err := ss.supplierRepo.GetRetailerByAddress(ctx, retailer.Address)
 	if err != nil && !errors.Is(err, errs.ErrRetailerDoesNotExists) {
 		return err
 	}
@@ -163,4 +163,17 @@ func (ss *SupplierService) DeleteManufacturerByID(ctx context.Context, manufactu
 	}
 
 	return nil
+}
+
+func (ss *SupplierService) GetRetailerByAddress(ctx context.Context, retailerAddress string) (*models.SupplierModel, error) {
+	existingRetailer, err := ss.supplierRepo.GetRetailerByAddress(ctx, retailerAddress)
+	if err != nil && !errors.Is(err, errs.ErrRetailerDoesNotExists) {
+		return nil, err
+	}
+
+	if existingRetailer == nil {
+		return nil, errs.ErrRetailerDoesNotExists
+	}
+
+	return existingRetailer, nil
 }

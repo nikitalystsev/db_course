@@ -8,23 +8,23 @@ import (
 	"strings"
 )
 
-func IsWithParams() (bool, error) {
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Printf("Would you like to enter search parameters?(Y/N): ")
-
-	isWithParams, err := reader.ReadString('\n')
-	if err != nil {
-		return false, err
-	}
-
-	isWithParams = strings.TrimSpace(isWithParams)
-	if isWithParams != "y" && isWithParams != "Y" {
-		return true, nil
-	}
-
-	return false, nil
-}
+//func IsWithParams() (bool, error) {
+//	reader := bufio.NewReader(os.Stdin)
+//
+//	fmt.Printf("Would you like to enter search parameters?(Y/N): ")
+//
+//	isWithParams, err := reader.ReadString('\n')
+//	if err != nil {
+//		return false, err
+//	}
+//
+//	isWithParams = strings.TrimSpace(isWithParams)
+//	if isWithParams != "y" && isWithParams != "Y" {
+//		return true, nil
+//	}
+//
+//	return false, nil
+//}
 
 func Title() (string, error) {
 	reader := bufio.NewReader(os.Stdin)
@@ -86,101 +86,101 @@ func Rarity() (string, error) {
 	return rarity, nil
 }
 
-func Genre() (string, error) {
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Printf("Input genre: ")
-
-	genre, err := reader.ReadString('\n')
-	if err != nil {
-		return "", err
-	}
-
-	genre = strings.TrimSpace(genre)
-
-	return genre, nil
-}
-
-func PublishingYear() (uint, error) {
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Printf("Input publishing year: ")
-
-	yearStr, err := reader.ReadString('\n')
-	if err != nil {
-		return 0, err
-	}
-
-	yearStr = strings.TrimSpace(yearStr)
-
-	yearInt, err := strconv.Atoi(yearStr)
-	if err != nil {
-		return 0, err
-	}
-
-	year := uint(yearInt)
-
-	return year, nil
-}
-
-func Language() (string, error) {
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Printf("Input language: ")
-
-	language, err := reader.ReadString('\n')
-	if err != nil {
-		return "", err
-	}
-
-	language = strings.TrimSpace(language)
-
-	return language, nil
-}
-
-func AgeLimit() (uint, error) {
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Printf("Input age limit: ")
-
-	ageLimitStr, err := reader.ReadString('\n')
-	if err != nil {
-		return 0, err
-	}
-
-	ageLimitStr = strings.TrimSpace(ageLimitStr)
-
-	ageLimitInt, err := strconv.Atoi(ageLimitStr)
-	if err != nil {
-		return 0, err
-	}
-
-	ageLimit := uint(ageLimitInt)
-
-	return ageLimit, nil
-}
-
-func CopiesNumber() (uint, error) {
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Printf("Input book's copies number: ")
-
-	copiesNumStr, err := reader.ReadString('\n')
-	if err != nil {
-		return 0, err
-	}
-
-	copiesNumStr = strings.TrimSpace(copiesNumStr)
-
-	copiesNumInt, err := strconv.Atoi(copiesNumStr)
-	if err != nil {
-		return 0, err
-	}
-
-	copiesNum := uint(copiesNumInt)
-
-	return copiesNum, nil
-}
+//func Genre() (string, error) {
+//	reader := bufio.NewReader(os.Stdin)
+//
+//	fmt.Printf("Input genre: ")
+//
+//	genre, err := reader.ReadString('\n')
+//	if err != nil {
+//		return "", err
+//	}
+//
+//	genre = strings.TrimSpace(genre)
+//
+//	return genre, nil
+//}
+//
+//func PublishingYear() (uint, error) {
+//	reader := bufio.NewReader(os.Stdin)
+//
+//	fmt.Printf("Input publishing year: ")
+//
+//	yearStr, err := reader.ReadString('\n')
+//	if err != nil {
+//		return 0, err
+//	}
+//
+//	yearStr = strings.TrimSpace(yearStr)
+//
+//	yearInt, err := strconv.Atoi(yearStr)
+//	if err != nil {
+//		return 0, err
+//	}
+//
+//	year := uint(yearInt)
+//
+//	return year, nil
+//}
+//
+//func Language() (string, error) {
+//	reader := bufio.NewReader(os.Stdin)
+//
+//	fmt.Printf("Input language: ")
+//
+//	language, err := reader.ReadString('\n')
+//	if err != nil {
+//		return "", err
+//	}
+//
+//	language = strings.TrimSpace(language)
+//
+//	return language, nil
+//}
+//
+//func AgeLimit() (uint, error) {
+//	reader := bufio.NewReader(os.Stdin)
+//
+//	fmt.Printf("Input age limit: ")
+//
+//	ageLimitStr, err := reader.ReadString('\n')
+//	if err != nil {
+//		return 0, err
+//	}
+//
+//	ageLimitStr = strings.TrimSpace(ageLimitStr)
+//
+//	ageLimitInt, err := strconv.Atoi(ageLimitStr)
+//	if err != nil {
+//		return 0, err
+//	}
+//
+//	ageLimit := uint(ageLimitInt)
+//
+//	return ageLimit, nil
+//}
+//
+//func CopiesNumber() (uint, error) {
+//	reader := bufio.NewReader(os.Stdin)
+//
+//	fmt.Printf("Input book's copies number: ")
+//
+//	copiesNumStr, err := reader.ReadString('\n')
+//	if err != nil {
+//		return 0, err
+//	}
+//
+//	copiesNumStr = strings.TrimSpace(copiesNumStr)
+//
+//	copiesNumInt, err := strconv.Atoi(copiesNumStr)
+//	if err != nil {
+//		return 0, err
+//	}
+//
+//	copiesNum := uint(copiesNumInt)
+//
+//	return copiesNum, nil
+//}
 
 //func Params() (dto.BookParamsDTO, error) {
 //	var params dto.BookParamsDTO

@@ -6,12 +6,12 @@ type UserSignInDTO struct {
 }
 
 type UserSignUpDTO struct {
-	Fio         string `json:"fio" db:"fio"`
-	PhoneNumber string `json:"phone_number" db:"phone_number"`
-	Password    string `json:"password" db:"password"`
+	Fio         string `json:"fio"`
+	PhoneNumber string `json:"phone_number"`
+	Password    string `json:"password"`
 }
 
-type ReaderTokensDTO struct {
+type UserTokensDTO struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	ExpiredAt    int64  `json:"expired_at"`
