@@ -26,6 +26,8 @@ func Run(configDir string) {
 		ratingRepo      intfRepo.IRatingRepo
 		supplierRepo    intfRepo.ISupplierRepo
 		saleProductRepo intfRepo.ISaleProductRepo
+		promotionRepo   intfRepo.IPromotionRepo
+		shopRepo        intfRepo.IShopRepo
 	)
 
 	client := redis.NewClient(&redis.Options{
@@ -52,6 +54,8 @@ func Run(configDir string) {
 	ratingRepo = impl.NewRatingRepo(db)
 	supplierRepo = impl.NewSupplierRepo(db)
 	saleProductRepo = impl.NewSaleProductRepo(db)
+	promotionRepo = impl.NewPromotionRepo(db)
+	shopRepo = impl.NewShopRepo(db)
 
 	tokenManager, err := auth.NewTokenManager(cfg.Auth.JWT.SigningKey)
 	if err != nil {
@@ -72,10 +76,14 @@ func Run(configDir string) {
 	ratingService := implServices.NewRatingService(ratingRepo)
 	supplierService := implServices.NewSupplierService(supplierRepo)
 	saleProductService := implServices.NewSaleProductService(saleProductRepo)
+	promotionService := implServices.NewPromotionService(promotionRepo)
+	shopService := implServices.NewShopService(shopRepo)
 
 	handler := handlers.NewHandler(
 		productService,
 		saleProductService,
+		promotionService,
+		shopService,
 		supplierService,
 		userService,
 		ratingService,

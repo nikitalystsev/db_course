@@ -13,14 +13,5 @@ type SaleProductModel struct {
 	Price       float32   `json:"price" db:"price"`
 	Currency    string    `json:"currency" db:"currency"`
 	SettingDate time.Time `json:"setting_date" db:"setting_date"`
-	AvgRating   *int      `json:"avg_rating" db:"avg_rating"`
-}
-
-type PromotionModel struct {
-	ID           uuid.UUID `json:"id" db:"id"`
-	Type         string    `json:"type" db:"type"`
-	Description  string    `json:"description" db:"description"`
-	DiscountSize int       `json:"discount_size" db:"discount_size"`
-	StartDate    time.Time `json:"start_date" db:"start_date"`
-	EndDate      time.Time `json:"end_date" db:"end_date"`
+	AvgRating   *float32  `json:"avg_rating" db:"avg_rating"`
 }

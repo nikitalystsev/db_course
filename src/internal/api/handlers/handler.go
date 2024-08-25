@@ -13,6 +13,7 @@ import (
 type Handler struct {
 	productService     intf.IProductService
 	saleProductService intf.ISaleProductService
+	promotionService   intf.IPromotionService
 	shopService        intf.IShopService
 	supplierService    intf.ISupplierService
 	userService        intf.IUserService
@@ -25,7 +26,8 @@ type Handler struct {
 func NewHandler(
 	productService intf.IProductService,
 	saleProductService intf.ISaleProductService,
-	//shopService intf.IShopService,
+	promotionService intf.IPromotionService,
+	shopService intf.IShopService,
 	supplierService intf.ISupplierService,
 	userService intf.IUserService,
 	ratingService intf.IRatingService,
@@ -36,13 +38,14 @@ func NewHandler(
 	return &Handler{
 		productService:     productService,
 		saleProductService: saleProductService,
-		//shopService:        shopService,
-		supplierService: supplierService,
-		userService:     userService,
-		ratingService:   ratingService,
-		tokenManager:    tokenManager,
-		accessTokenTTL:  accessTokenTTL,
-		refreshTokenTTL: refreshTokenTTL,
+		promotionService:   promotionService,
+		shopService:        shopService,
+		supplierService:    supplierService,
+		userService:        userService,
+		ratingService:      ratingService,
+		tokenManager:       tokenManager,
+		accessTokenTTL:     accessTokenTTL,
+		refreshTokenTTL:    refreshTokenTTL,
 	}
 }
 

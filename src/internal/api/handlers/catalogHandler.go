@@ -6,6 +6,7 @@ import (
 	"SmartShopper-services/errs"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
@@ -30,7 +31,7 @@ func (h *Handler) getProductByID(c *gin.Context) {
 		return
 	}
 
-	retailer, err := h.getRetailer(product.RetailerID)
+	retailer, err := h.getRetailerByID(product.RetailerID)
 	if err != nil && errors.Is(err, errs.ErrRetailerDoesNotExists) {
 		c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
 		return
@@ -40,7 +41,7 @@ func (h *Handler) getProductByID(c *gin.Context) {
 		return
 	}
 
-	distributor, err := h.getDistributor(product.DistributorID)
+	distributor, err := h.getDistributorByID(product.DistributorID)
 	if err != nil && errors.Is(err, errs.ErrDistributorDoesNotExists) {
 		c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
 		return
@@ -50,7 +51,7 @@ func (h *Handler) getProductByID(c *gin.Context) {
 		return
 	}
 
-	manufacturer, err := h.getManufacturer(product.ManufacturerID)
+	manufacturer, err := h.getManufacturerByID(product.ManufacturerID)
 	if err != nil && errors.Is(err, errs.ErrDistributorDoesNotExists) {
 		c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
 		return
@@ -132,9 +133,17 @@ func (h *Handler) getSalesByProductID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, sales)
+	fmt.Println("Тут не паникуем")
+	salesDTO, err := h.copySalesToDTO(sales)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, salesDTO)
 }
-func (h *Handler) getRetailer(retailerID uuid.UUID) (*models.SupplierModel, error) {
+
+func (h *Handler) getRetailerByID(retailerID uuid.UUID) (*models.SupplierModel, error) {
 	retailer, err := h.supplierService.GetRetailerByID(context.Background(), retailerID)
 	if err != nil {
 		return nil, err
@@ -143,7 +152,7 @@ func (h *Handler) getRetailer(retailerID uuid.UUID) (*models.SupplierModel, erro
 	return retailer, nil
 }
 
-func (h *Handler) getDistributor(distributorID uuid.UUID) (*models.SupplierModel, error) {
+func (h *Handler) getDistributorByID(distributorID uuid.UUID) (*models.SupplierModel, error) {
 	retailer, err := h.supplierService.GetDistributorByID(context.Background(), distributorID)
 	if err != nil {
 		return nil, err
@@ -152,11 +161,94 @@ func (h *Handler) getDistributor(distributorID uuid.UUID) (*models.SupplierModel
 	return retailer, nil
 }
 
-func (h *Handler) getManufacturer(manufacturerID uuid.UUID) (*models.SupplierModel, error) {
+func (h *Handler) getManufacturerByID(manufacturerID uuid.UUID) (*models.SupplierModel, error) {
 	retailer, err := h.supplierService.GetManufacturerByID(context.Background(), manufacturerID)
 	if err != nil {
 		return nil, err
 	}
 
 	return retailer, nil
+}
+
+func (h *Handler) getShopByID(shopID uuid.UUID) (*models.ShopModel, error) {
+	shop, err := h.shopService.GetByID(context.Background(), shopID)
+	if err != nil {
+		return nil, err
+	}
+
+	return shop, nil
+}
+
+func (h *Handler) getPromotionByID(promotionID uuid.UUID) (*models.PromotionModel, error) {
+	if promotionID == uuid.Nil {
+		return nil, errs.ErrPromotionDoesNotExists
+	}
+
+	promotion, err := h.promotionService.GetByID(context.Background(), promotionID)
+	if err != nil {
+		return nil, err
+	}
+
+	return promotion, nil
+}
+
+func (h *Handler) copySalesToDTO(sales []*models.SaleProductModel) ([]*dto.SaleProductDTO, error) {
+	fmt.Println("call copySalesToDTO")
+
+	var salesDTO []*dto.SaleProductDTO
+
+	for _, saleProduct := range sales {
+		fmt.Println("Тут тоже не паникуем. Пытаемся скопировать очередной элемент")
+		saleDTO, err := h.copySaleToDTO(saleProduct)
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println("успешно скопирован очередной элемент")
+		salesDTO = append(salesDTO, saleDTO)
+	}
+
+	return salesDTO, nil
+}
+
+func (h *Handler) copySaleToDTO(sale *models.SaleProductModel) (*dto.SaleProductDTO, error) {
+	fmt.Println("call copySaleToDTO")
+
+	shop, err := h.getShopByID(sale.ShopID)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("Тут не паникуем. Получили магазин")
+
+	var saleProduct dto.SaleProductDTO
+	saleProduct.ShopTitle = shop.Title
+	saleProduct.ShopAddress = shop.Address
+
+	fmt.Println("Тут не паникуем. заполнили магазин")
+
+	promotion, err := h.getPromotionByID(sale.PromotionID)
+	if err != nil && !errors.Is(err, errs.ErrPromotionDoesNotExists) {
+		return nil, err
+	}
+
+	fmt.Println("Не запаниковали. получили акцию")
+
+	if promotion == nil {
+		saleProduct.PromotionType = "Нет акции"
+		saleProduct.PromotionDescription = "Нет акции"
+		saleProduct.PromotionDiscountSize = nil
+	} else {
+		saleProduct.PromotionType = promotion.Type
+		saleProduct.PromotionDescription = promotion.Description
+		saleProduct.PromotionDiscountSize = &promotion.DiscountSize
+	}
+
+	fmt.Println("Не запаниковали. заполняем остатки")
+
+	saleProduct.Price = sale.Price
+	saleProduct.Currency = sale.Currency
+	saleProduct.SettingDate = sale.SettingDate
+	saleProduct.AvgRating = sale.AvgRating
+
+	return &saleProduct, nil
 }

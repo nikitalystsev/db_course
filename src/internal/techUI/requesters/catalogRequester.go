@@ -213,12 +213,12 @@ func (r *Requester) comparePriceOnProduct() error {
 		return errors.New(info)
 	}
 
-	var sales []*models.SaleProductModel
-	if err = json.Unmarshal(response.Body, &sales); err != nil {
+	var salesDTO []*dto.SaleProductDTO
+	if err = json.Unmarshal(response.Body, &salesDTO); err != nil {
 		return err
 	}
 
-	printSales(sales, num)
+	printSales(salesDTO, num)
 
 	return nil
 }
@@ -262,15 +262,48 @@ func printProduct(product *dto.ProductDTO, num int) {
 	fmt.Println(t.Render())
 }
 
-func printSales(sales []*models.SaleProductModel, num int) {
+func printSales(salesDTO []*dto.SaleProductDTO, num int) {
 	t := table.NewWriter()
 	t.SetTitle(fmt.Sprintf("Места продажи товара №%d", num))
 	t.SetStyle(table.StyleBold)
 	t.Style().Format.Header = text.FormatTitle
-	t.AppendHeader(table.Row{"No.", "Цена товара", "Валюта"})
+	t.AppendHeader(
+		table.Row{"No.",
+			"Магазин",
+			"Адрес",
+			"Цена",
+			"Валюта",
+			"Тип акции",
+			"Размер скидки",
+			"Средний рейтинг",
+		},
+	)
 
-	for i, saleProduct := range sales {
-		t.AppendRow(table.Row{i, saleProduct.Price, saleProduct.Currency})
+	for i, saleProduct := range salesDTO {
+		var discountSize string
+		if saleProduct.PromotionDiscountSize == nil {
+			discountSize = fmt.Sprintf("%d", 0)
+		} else {
+			discountSize = fmt.Sprintf("%d", *saleProduct.PromotionDiscountSize)
+		}
+		var avgRating string
+		if saleProduct.AvgRating == nil {
+			avgRating = "Не оценен"
+		} else {
+			avgRating = fmt.Sprintf("%f", *saleProduct.AvgRating)
+		}
+		t.AppendRow(
+			table.Row{
+				i,
+				saleProduct.ShopTitle,
+				saleProduct.ShopAddress,
+				saleProduct.Price,
+				saleProduct.Currency,
+				saleProduct.PromotionType,
+				discountSize,
+				avgRating,
+			},
+		)
 	}
 
 	fmt.Println(t.Render())

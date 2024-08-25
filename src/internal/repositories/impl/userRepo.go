@@ -28,7 +28,6 @@ func (ur *UserRepo) Create(ctx context.Context, user *models.UserModel) error {
 
 	result, err := ur.db.ExecContext(ctx, query, user.ID, user.Fio, user.PhoneNumber, user.Password, user.RegistrationDate)
 	if err != nil {
-		println("блять уже тут")
 		return err
 	}
 
