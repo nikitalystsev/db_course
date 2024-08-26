@@ -83,6 +83,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		registered.POST("/shops", h.addShop)
 		registered.GET("/shops", h.getShops)
 		registered.GET("/sales", h.getSalesByShopID)
+		registered.PUT("/sales/:id", h.updateSaleProductPriceByID)
 	}
 	return router
 }

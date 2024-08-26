@@ -243,6 +243,26 @@ func ProductPagesNumber() (int, error) {
 	return numInt, nil
 }
 
+func SaleProductPrice() (float32, error) {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Printf("Введите новую цену: ")
+
+	numStr, err := reader.ReadString('\n')
+	if err != nil {
+		return 0, err
+	}
+
+	numStr = strings.TrimSpace(numStr)
+
+	numFloat, err := strconv.ParseFloat(numStr, 32)
+	if err != nil {
+		return 0, err
+	}
+
+	return float32(numFloat), nil
+}
+
 //
 //func Book() (models.BookModel, error) {
 //	var book models.BookModel

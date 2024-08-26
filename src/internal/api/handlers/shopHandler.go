@@ -79,6 +79,41 @@ func (h *Handler) getSalesByShopID(c *gin.Context) {
 	c.JSON(http.StatusOK, salesDTO)
 }
 
+func (h *Handler) updateSaleProductPriceByID(c *gin.Context) {
+	saleProductIDStr := c.Param("id")
+	saleProductID, err := uuid.Parse(saleProductIDStr)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var newPrice float32
+	if err = c.BindJSON(&newPrice); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	sale, err := h.saleProductService.GetByID(c.Request.Context(), saleProductID)
+	if err != nil && errors.Is(err, errs.ErrSaleProductDoesNotExists) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
+		return
+	}
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	sale.Price = newPrice
+
+	err = h.saleProductService.Update(c.Request.Context(), sale)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
 func (h *Handler) getProductForShopByID(productID uuid.UUID) (*models.ProductModel, error) {
 	product, err := h.productService.GetByID(context.Background(), productID)
 	if err != nil {

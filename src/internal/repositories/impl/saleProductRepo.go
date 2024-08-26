@@ -5,6 +5,8 @@ import (
 	"SmartShopper-services/errs"
 	"SmartShopper-services/intfRepo"
 	"context"
+	"database/sql"
+	"errors"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -45,4 +47,36 @@ func (spr *SaleProductRepo) GetByShopID(ctx context.Context, shopID uuid.UUID) (
 	}
 
 	return sales, nil
+}
+
+func (spr *SaleProductRepo) GetByID(ctx context.Context, ID uuid.UUID) (*models.SaleProductModel, error) {
+	query := `select id, shop_id, product_id, promotion_id, price, currency, setting_date, avg_rating from ss.sale_product where id = $1`
+
+	var sale models.SaleProductModel
+	err := spr.db.GetContext(ctx, &sale, query, ID)
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, errs.ErrSaleProductDoesNotExists
+	}
+
+	return &sale, nil
+}
+
+func (spr *SaleProductRepo) Update(ctx context.Context, saleProduct *models.SaleProductModel) error {
+	query := `update ss.sale_product set price = $1 where id = $2`
+
+	result, err := spr.db.ExecContext(ctx, query, saleProduct.Price, saleProduct.ID)
+	if err != nil {
+		return err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows != 1 {
+		return errors.New("saleProductRepo.Update expected 1 row affected")
+	}
+	return nil
 }
