@@ -108,6 +108,7 @@ func (h *Handler) copySaleToShopDTO(sale *models.SaleProductModel) (*dto.SalePro
 		return nil, err
 	}
 	var saleProduct dto.SaleProductShopDTO
+	saleProduct.ID = sale.ID
 	saleProduct.ProductName = product.Name
 	saleProduct.ProductCategories = product.Categories
 

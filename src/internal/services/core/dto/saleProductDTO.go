@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"github.com/google/uuid"
 	"time"
 )
 
@@ -17,6 +18,7 @@ type SaleProductDTO struct {
 }
 
 type SaleProductShopDTO struct {
+	ID                    uuid.UUID `json:"id"`
 	ProductName           string    `json:"name"`
 	ProductCategories     string    `json:"categories"`
 	PromotionType         string    `json:"promotion_type"`

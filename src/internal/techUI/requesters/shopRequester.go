@@ -24,8 +24,9 @@ const shopMenu = `Меню обработки магазинов:
 `
 
 const (
-	shopsKey      = "shops"
-	shopParamsKey = "shopParams"
+	shopsKey            = "shops"
+	shopParamsKey       = "shopParams"
+	shopProductSalesKey = "shopProductSales"
 )
 
 func (r *Requester) processShopActions() error {
@@ -215,6 +216,65 @@ func (r *Requester) addRatingProductByShop() error {
 		return err
 	}
 
+	if err := r.getSalesByShopID(tokens); err != nil {
+		return err
+	}
+
+	var shopProductSales []uuid.UUID
+	if err := r.cache.Get(shopProductSalesKey, &shopProductSales); err != nil {
+		return err
+	}
+
+	num, err := input.ProductPagesNumber()
+	if err != nil {
+		return err
+	}
+
+	if num > len(shopProductSales)-1 || num < 0 { // num -- это индекс
+		return errors.New("номер товара выходит из диапазона выведенных значений")
+	}
+
+	saleProductID := shopProductSales[num]
+
+	ratingDTO, err := input.RatingParams()
+	if err != nil {
+		return err
+	}
+	ratingDTO.SaleProductID = saleProductID
+
+	request := HTTPRequest{
+		Method: http.MethodPost,
+		URL:    r.baseURL + "/api/ratings",
+		Headers: map[string]string{
+			"Content-Type":  "application/json",
+			"Authorization": fmt.Sprintf("Bearer %s", tokens.AccessToken),
+		},
+		Body:    ratingDTO,
+		Timeout: 10 * time.Second,
+	}
+	response, err := SendRequest(request)
+	if err != nil {
+		return err
+	}
+	if response.StatusCode != http.StatusCreated {
+		var info string
+		if err = json.Unmarshal(response.Body, &info); err != nil {
+			return err
+		}
+		return errors.New(info)
+	}
+
+	fmt.Printf("\n\nОтзыв был успешно добавлен!\n")
+
+	return nil
+}
+
+func (r *Requester) getSalesByShopID(tokens dto.UserTokensDTO) error {
+	var shopPagesID []uuid.UUID
+	if err := r.cache.Get(shopsKey, &shopPagesID); err != nil {
+		return err
+	}
+
 	num, err := input.ShopPagesNumber()
 	if err != nil {
 		return err
@@ -225,8 +285,6 @@ func (r *Requester) addRatingProductByShop() error {
 	}
 
 	shopID := shopPagesID[num]
-
-	fmt.Println("shopID: ", shopID)
 
 	request := HTTPRequest{
 		Method: http.MethodGet,
@@ -258,6 +316,9 @@ func (r *Requester) addRatingProductByShop() error {
 	}
 
 	printShopSales(sales, num)
+	var shopProductSales []uuid.UUID
+	copyShopProductIDsToArray(&shopProductSales, sales)
+	r.cache.Set(shopProductSalesKey, shopProductSales)
 
 	return nil
 }
@@ -326,4 +387,10 @@ func printShopSales(salesDTO []*dto.SaleProductShopDTO, num int) {
 	}
 
 	fmt.Println(t.Render())
+}
+
+func copyShopProductIDsToArray(salesIDs *[]uuid.UUID, sales []*dto.SaleProductShopDTO) {
+	for _, saleProduct := range sales {
+		*salesIDs = append(*salesIDs, saleProduct.ID)
+	}
 }
