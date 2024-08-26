@@ -10,6 +10,8 @@ import (
 	"SmartShopper-services/pkg/hash"
 	"SmartShopper/internal/config"
 	"fmt"
+	trmsqlx "github.com/avito-tech/go-transaction-manager/drivers/sqlx/v2"
+	"github.com/avito-tech/go-transaction-manager/trm/v2/manager"
 	"github.com/go-redis/redis/v8"
 	_ "github.com/lib/pq"
 )
@@ -65,6 +67,11 @@ func Run(configDir string) {
 		return
 	}
 
+	trm, err := manager.New(trmsqlx.NewDefaultFactory(db))
+	if err != nil {
+		return
+	}
+
 	hasher := hash.NewPasswordHasher(cfg.Auth.PasswordSalt)
 
 	userService := implServices.NewUserService(
@@ -77,10 +84,17 @@ func Run(configDir string) {
 	productService := implServices.NewProductService(productRepo)
 	ratingService := implServices.NewRatingService(ratingRepo)
 	supplierService := implServices.NewSupplierService(supplierRepo)
-	saleProductService := implServices.NewSaleProductService(saleProductRepo)
 	promotionService := implServices.NewPromotionService(promotionRepo)
 	shopService := implServices.NewShopService(shopRepo)
 	certificateService := implServices.NewCertificateService(certificateRepo)
+	saleProductService := implServices.NewSaleProductService(
+		saleProductRepo,
+		supplierRepo,
+		productRepo,
+		promotionRepo,
+		shopRepo,
+		trm,
+	)
 
 	handler := handlers.NewHandler(
 		productService,

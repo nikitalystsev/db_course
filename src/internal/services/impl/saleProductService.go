@@ -1,21 +1,48 @@
 package impl
 
 import (
+	"SmartShopper-services/core/dto"
 	"SmartShopper-services/core/models"
 	"SmartShopper-services/errs"
 	"SmartShopper-services/intf"
 	"SmartShopper-services/intfRepo"
+	"SmartShopper-services/pkg/transact"
 	"context"
 	"errors"
 	"github.com/google/uuid"
 )
 
 type SaleProductService struct {
-	saleProductRepo intfRepo.ISaleProductRepo
+	saleProductRepo    intfRepo.ISaleProductRepo
+	supplierRepo       intfRepo.ISupplierRepo
+	productRepo        intfRepo.IProductRepo
+	promotionRepo      intfRepo.IPromotionRepo
+	shopRepo           intfRepo.IShopRepo
+	transactionManager transact.ITransactionManager
 }
 
-func NewSaleProductService(saleProductRepo intfRepo.ISaleProductRepo) intf.ISaleProductService {
-	return &SaleProductService{saleProductRepo: saleProductRepo}
+func NewSaleProductService(
+	saleProductRepo intfRepo.ISaleProductRepo,
+	supplierRepo intfRepo.ISupplierRepo,
+	productRepo intfRepo.IProductRepo,
+	promotionRepo intfRepo.IPromotionRepo,
+	shopRepo intfRepo.IShopRepo,
+	transactionManager transact.ITransactionManager,
+) intf.ISaleProductService {
+	return &SaleProductService{
+		saleProductRepo:    saleProductRepo,
+		supplierRepo:       supplierRepo,
+		productRepo:        productRepo,
+		promotionRepo:      promotionRepo,
+		shopRepo:           shopRepo,
+		transactionManager: transactionManager,
+	}
+}
+
+func (sps *SaleProductService) Create(ctx context.Context, saleProduct *dto.NewSaleProductDTO) error {
+	return sps.transactionManager.Do(ctx, func(ctx context.Context) error {
+		// логика
+	})
 }
 
 func (sps *SaleProductService) GetByProductID(ctx context.Context, productID uuid.UUID) ([]*models.SaleProductModel, error) {

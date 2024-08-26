@@ -114,92 +114,20 @@ func (h *Handler) updateSaleProductPriceByID(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func (h *Handler) addDistributorIfNotExist(c *gin.Context) {
-	var distributorDTO dto.SupplierDTO
-	if err := c.BindJSON(&distributorDTO); err != nil {
+func (h *Handler) addSaleProductInShop(c *gin.Context) {
+	var newSaleProductDTO dto.NewSaleProductDTO
+	if err := c.BindJSON(&newSaleProductDTO); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	distributor := &models.SupplierModel{
-		ID:                uuid.New(),
-		Title:             distributorDTO.Title,
-		Address:           distributorDTO.Address,
-		PhoneNumber:       distributorDTO.PhoneNumber,
-		FioRepresentative: distributorDTO.FioRepresentative,
-	}
-
-	err := h.supplierService.CreateDistributor(c.Request.Context(), distributor)
-	if err != nil && errors.Is(err, errs.ErrDistributorAlreadyExist) {
-		c.AbortWithStatusJSON(http.StatusConflict, err.Error())
-		return
-	}
+	err := h.saleProductService.Create(c.Request.Context(), &newSaleProductDTO)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, distributor.ID)
-}
-
-func (h *Handler) getDistributorByAddress(c *gin.Context) {
-	address := c.Query("address")
-
-	distributor, err := h.supplierService.GetDistributorByAddress(c.Request.Context(), address)
-	if err != nil && errors.Is(err, errs.ErrRetailerDoesNotExists) {
-		c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
-		return
-	}
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, distributor.ID)
-}
-
-func (h *Handler) addManufacturerIfNotExist(c *gin.Context) {
-	var manufacturerDTO dto.SupplierDTO
-	if err := c.BindJSON(&manufacturerDTO); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
-		return
-	}
-
-	manufacturer := &models.SupplierModel{
-		ID:                uuid.New(),
-		Title:             manufacturerDTO.Title,
-		Address:           manufacturerDTO.Address,
-		PhoneNumber:       manufacturerDTO.PhoneNumber,
-		FioRepresentative: manufacturerDTO.FioRepresentative,
-	}
-
-	err := h.supplierService.CreateManufacturer(c.Request.Context(), manufacturer)
-	if err != nil && errors.Is(err, errs.ErrRetailerAlreadyExist) {
-		c.AbortWithStatusJSON(http.StatusConflict, err.Error())
-		return
-	}
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, manufacturer.ID)
-}
-
-func (h *Handler) getManufacturerByAddress(c *gin.Context) {
-	address := c.Query("address")
-
-	manufacturer, err := h.supplierService.GetManufacturerByAddress(c.Request.Context(), address)
-	if err != nil && errors.Is(err, errs.ErrRetailerDoesNotExists) {
-		c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
-		return
-	}
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, manufacturer.ID)
+	c.Status(http.StatusCreated)
 }
 
 func (h *Handler) getProductForShopByID(productID uuid.UUID) (*models.ProductModel, error) {

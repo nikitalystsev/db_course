@@ -8,4 +8,5 @@ import (
 
 type IPromotionService interface {
 	GetByID(ctx context.Context, ID uuid.UUID) (*models.PromotionModel, error)
+	Create(ctx context.Context, promotion *models.PromotionModel) error
 }

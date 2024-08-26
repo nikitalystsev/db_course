@@ -1,6 +1,7 @@
 package input
 
 import (
+	"SmartShopper-services/core/dto"
 	"bufio"
 	"fmt"
 	"os"
@@ -8,28 +9,10 @@ import (
 	"strings"
 )
 
-//func IsWithParams() (bool, error) {
-//	reader := bufio.NewReader(os.Stdin)
-//
-//	fmt.Printf("Would you like to enter search parameters?(Y/N): ")
-//
-//	isWithParams, err := reader.ReadString('\n')
-//	if err != nil {
-//		return false, err
-//	}
-//
-//	isWithParams = strings.TrimSpace(isWithParams)
-//	if isWithParams != "y" && isWithParams != "Y" {
-//		return true, nil
-//	}
-//
-//	return false, nil
-//}
-
-func Title() (string, error) {
+func Name() (string, error) {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Printf("Input title: ")
+	fmt.Printf("Введите название товара: ")
 
 	title, err := reader.ReadString('\n')
 	if err != nil {
@@ -41,10 +24,10 @@ func Title() (string, error) {
 	return title, nil
 }
 
-func Author() (string, error) {
+func Categories() (string, error) {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Printf("Input author: ")
+	fmt.Printf("Введите категории товара: ")
 
 	author, err := reader.ReadString('\n')
 	if err != nil {
@@ -56,10 +39,25 @@ func Author() (string, error) {
 	return author, nil
 }
 
-func Publisher() (string, error) {
+func Brand() (string, error) {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Printf("Input publisher: ")
+	fmt.Printf("Введите бренд товара: ")
+
+	author, err := reader.ReadString('\n')
+	if err != nil {
+		return "", err
+	}
+
+	author = strings.TrimSpace(author)
+
+	return author, nil
+}
+
+func Compound() (string, error) {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Printf("Введите состав: ")
 
 	publisher, err := reader.ReadString('\n')
 	if err != nil {
@@ -71,157 +69,91 @@ func Publisher() (string, error) {
 	return publisher, nil
 }
 
-func Rarity() (string, error) {
+func GrossMass() (float32, error) {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Printf("Input rarity: ")
+	fmt.Printf("Введите массу брутто: ")
 
-	rarity, err := reader.ReadString('\n')
+	numStr, err := reader.ReadString('\n')
+	if err != nil {
+		return 0, err
+	}
+
+	numStr = strings.TrimSpace(numStr)
+
+	numFloat, err := strconv.ParseFloat(numStr, 32)
+	if err != nil {
+		return 0, err
+	}
+
+	return float32(numFloat), nil
+}
+
+func NetMass() (float32, error) {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Printf("Введите массу нетто: ")
+
+	numStr, err := reader.ReadString('\n')
+	if err != nil {
+		return 0, err
+	}
+
+	numStr = strings.TrimSpace(numStr)
+
+	numFloat, err := strconv.ParseFloat(numStr, 32)
+	if err != nil {
+		return 0, err
+	}
+
+	return float32(numFloat), nil
+}
+
+func PackageType() (string, error) {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Printf("Введите тип упаковки: ")
+
+	publisher, err := reader.ReadString('\n')
 	if err != nil {
 		return "", err
 	}
 
-	rarity = strings.TrimSpace(rarity)
+	publisher = strings.TrimSpace(publisher)
 
-	return rarity, nil
+	return publisher, nil
 }
 
-//func Genre() (string, error) {
-//	reader := bufio.NewReader(os.Stdin)
-//
-//	fmt.Printf("Input genre: ")
-//
-//	genre, err := reader.ReadString('\n')
-//	if err != nil {
-//		return "", err
-//	}
-//
-//	genre = strings.TrimSpace(genre)
-//
-//	return genre, nil
-//}
-//
-//func PublishingYear() (uint, error) {
-//	reader := bufio.NewReader(os.Stdin)
-//
-//	fmt.Printf("Input publishing year: ")
-//
-//	yearStr, err := reader.ReadString('\n')
-//	if err != nil {
-//		return 0, err
-//	}
-//
-//	yearStr = strings.TrimSpace(yearStr)
-//
-//	yearInt, err := strconv.Atoi(yearStr)
-//	if err != nil {
-//		return 0, err
-//	}
-//
-//	year := uint(yearInt)
-//
-//	return year, nil
-//}
-//
-//func Language() (string, error) {
-//	reader := bufio.NewReader(os.Stdin)
-//
-//	fmt.Printf("Input language: ")
-//
-//	language, err := reader.ReadString('\n')
-//	if err != nil {
-//		return "", err
-//	}
-//
-//	language = strings.TrimSpace(language)
-//
-//	return language, nil
-//}
-//
-//func AgeLimit() (uint, error) {
-//	reader := bufio.NewReader(os.Stdin)
-//
-//	fmt.Printf("Input age limit: ")
-//
-//	ageLimitStr, err := reader.ReadString('\n')
-//	if err != nil {
-//		return 0, err
-//	}
-//
-//	ageLimitStr = strings.TrimSpace(ageLimitStr)
-//
-//	ageLimitInt, err := strconv.Atoi(ageLimitStr)
-//	if err != nil {
-//		return 0, err
-//	}
-//
-//	ageLimit := uint(ageLimitInt)
-//
-//	return ageLimit, nil
-//}
-//
-//func CopiesNumber() (uint, error) {
-//	reader := bufio.NewReader(os.Stdin)
-//
-//	fmt.Printf("Input book's copies number: ")
-//
-//	copiesNumStr, err := reader.ReadString('\n')
-//	if err != nil {
-//		return 0, err
-//	}
-//
-//	copiesNumStr = strings.TrimSpace(copiesNumStr)
-//
-//	copiesNumInt, err := strconv.Atoi(copiesNumStr)
-//	if err != nil {
-//		return 0, err
-//	}
-//
-//	copiesNum := uint(copiesNumInt)
-//
-//	return copiesNum, nil
-//}
+func ProductParams() (dto.NewProductDTO, error) {
+	var (
+		newProduct dto.NewProductDTO
+		err        error
+	)
 
-//func Params() (dto.BookParamsDTO, error) {
-//	var params dto.BookParamsDTO
-//	var err error
-//
-//	params.Title, err = Title()
-//	if err != nil {
-//		return dto.BookParamsDTO{Limit: 5, Offset: 0}, err
-//	}
-//	params.Author, err = Author()
-//	if err != nil {
-//		return dto.BookParamsDTO{Limit: 5, Offset: 0}, err
-//	}
-//	params.Publisher, err = Publisher()
-//	if err != nil {
-//		return dto.BookParamsDTO{Limit: 5, Offset: 0}, err
-//	}
-//	params.Rarity, err = Rarity()
-//	if err != nil {
-//		return dto.BookParamsDTO{Limit: 5, Offset: 0}, err
-//	}
-//	params.Genre, err = Genre()
-//	if err != nil {
-//		return dto.BookParamsDTO{Limit: 5, Offset: 0}, err
-//	}
-//	params.PublishingYear, err = PublishingYear()
-//	if err != nil {
-//		return dto.BookParamsDTO{Limit: 5, Offset: 0}, err
-//	}
-//	params.Language, err = Language()
-//	if err != nil {
-//		return dto.BookParamsDTO{Limit: 5, Offset: 0}, err
-//	}
-//	params.AgeLimit, err = AgeLimit()
-//	if err != nil {
-//		return dto.BookParamsDTO{Limit: 5, Offset: 0}, err
-//	}
-//
-//	return params, nil
-//}
-//
+	if newProduct.Name, err = Name(); err != nil {
+		return dto.NewProductDTO{}, err
+	}
+	if newProduct.Categories, err = Categories(); err != nil {
+		return dto.NewProductDTO{}, err
+	}
+	if newProduct.Brand, err = Brand(); err != nil {
+		return dto.NewProductDTO{}, err
+	}
+	if newProduct.Compound, err = Compound(); err != nil {
+		return dto.NewProductDTO{}, err
+	}
+	if newProduct.GrossMass, err = GrossMass(); err != nil {
+		return dto.NewProductDTO{}, err
+	}
+	if newProduct.NetMass, err = NetMass(); err != nil {
+		return dto.NewProductDTO{}, err
+	}
+	if newProduct.PackageType, err = PackageType(); err != nil {
+		return dto.NewProductDTO{}, err
+	}
+
+	return newProduct, nil
+}
 
 func ProductPagesNumber() (int, error) {
 	reader := bufio.NewReader(os.Stdin)
@@ -242,68 +174,3 @@ func ProductPagesNumber() (int, error) {
 
 	return numInt, nil
 }
-
-func SaleProductPrice() (float32, error) {
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Printf("Введите новую цену: ")
-
-	numStr, err := reader.ReadString('\n')
-	if err != nil {
-		return 0, err
-	}
-
-	numStr = strings.TrimSpace(numStr)
-
-	numFloat, err := strconv.ParseFloat(numStr, 32)
-	if err != nil {
-		return 0, err
-	}
-
-	return float32(numFloat), nil
-}
-
-//
-//func Book() (models.BookModel, error) {
-//	var book models.BookModel
-//	var err error
-//
-//	book.Title, err = Title()
-//	if err != nil {
-//		return models.BookModel{}, err
-//	}
-//	book.Author, err = Author()
-//	if err != nil {
-//		return models.BookModel{}, err
-//	}
-//	book.Publisher, err = Publisher()
-//	if err != nil {
-//		return models.BookModel{}, err
-//	}
-//	book.CopiesNumber, err = CopiesNumber()
-//	if err != nil {
-//		return models.BookModel{}, err
-//	}
-//	book.Rarity, err = Rarity()
-//	if err != nil {
-//		return models.BookModel{}, err
-//	}
-//	book.Genre, err = Genre()
-//	if err != nil {
-//		return models.BookModel{}, err
-//	}
-//	book.PublishingYear, err = PublishingYear()
-//	if err != nil {
-//		return models.BookModel{}, err
-//	}
-//	book.Language, err = Language()
-//	if err != nil {
-//		return models.BookModel{}, err
-//	}
-//	book.AgeLimit, err = AgeLimit()
-//	if err != nil {
-//		return models.BookModel{}, err
-//	}
-//
-//	return book, nil
-//}

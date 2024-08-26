@@ -80,15 +80,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		registered.POST("/ratings", h.addSaleProductRating)
 		registered.POST("/retailers", h.addRetailerIfNotExist)
 		registered.GET("/retailers", h.getRetailerByAddress)
-		registered.POST("/distributors")
-		registered.GET("/distributors")
-		registered.POST("/manufacturers")
-		registered.GET("/manufacturers")
 		registered.POST("/shops", h.addShop)
 		registered.GET("/shops", h.getShops)
 		registered.GET("/sales", h.getSalesByShopID)
+		registered.POST("/sales", h.addSaleProductInShop)
 		registered.PUT("/sales/:id", h.updateSaleProductPriceByID)
 	}
+
 	return router
 }
 

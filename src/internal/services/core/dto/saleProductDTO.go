@@ -28,3 +28,17 @@ type SaleProductShopDTO struct {
 	SettingDate           time.Time `json:"setting_date" db:"setting_date"`
 	AvgRating             *float32  `json:"avg_rating" db:"avg_rating"`
 }
+
+type PriceDTO struct {
+	Price       float32   `json:"price"`
+	Currency    string    `json:"currency"`
+	SettingDate time.Time `json:"setting_date"`
+}
+
+type NewSaleProductDTO struct {
+	ShopID    uuid.UUID
+	Promotion PromotionDTO
+	Product   ProductDTO
+	Suppliers [3]*SupplierDTO
+	Price     PriceDTO
+}
