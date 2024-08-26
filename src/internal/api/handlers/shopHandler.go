@@ -6,6 +6,7 @@ import (
 	"SmartShopper-services/errs"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
@@ -115,6 +116,8 @@ func (h *Handler) updateSaleProductPriceByID(c *gin.Context) {
 }
 
 func (h *Handler) addSaleProductInShop(c *gin.Context) {
+	fmt.Println("call addSaleProductInShop")
+
 	var newSaleProductDTO dto.NewSaleProductDTO
 	if err := c.BindJSON(&newSaleProductDTO); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
@@ -123,6 +126,7 @@ func (h *Handler) addSaleProductInShop(c *gin.Context) {
 
 	err := h.saleProductService.Create(c.Request.Context(), &newSaleProductDTO)
 	if err != nil {
+		fmt.Println("error: ", err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
 		return
 	}

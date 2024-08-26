@@ -18,6 +18,15 @@ func NewPromotionService(promotionRepo intfRepo.IPromotionRepo) intf.IPromotionS
 	return &PromotionService{promotionRepo: promotionRepo}
 }
 
+func (ps *PromotionService) Create(ctx context.Context, promotion *models.PromotionModel) error {
+	err := ps.promotionRepo.Create(ctx, promotion)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (ps *PromotionService) GetByID(ctx context.Context, ID uuid.UUID) (*models.PromotionModel, error) {
 	existingPromotion, err := ps.promotionRepo.GetByID(ctx, ID)
 	if err != nil && errors.Is(err, errs.ErrPromotionDoesNotExists) {

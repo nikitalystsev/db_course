@@ -40,36 +40,6 @@ func Description() (string, error) {
 	return author, nil
 }
 
-func D() (string, error) {
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Printf("Введите бренд товара: ")
-
-	author, err := reader.ReadString('\n')
-	if err != nil {
-		return "", err
-	}
-
-	author = strings.TrimSpace(author)
-
-	return author, nil
-}
-
-func Compound() (string, error) {
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Printf("Введите состав: ")
-
-	publisher, err := reader.ReadString('\n')
-	if err != nil {
-		return "", err
-	}
-
-	publisher = strings.TrimSpace(publisher)
-
-	return publisher, nil
-}
-
 func DiscountSize() (int, error) {
 	reader := bufio.NewReader(os.Stdin)
 

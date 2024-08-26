@@ -22,4 +22,10 @@ type ISupplierRepo interface {
 	GetRetailerByAddress(ctx context.Context, retailerAddress string) (*models.SupplierModel, error)
 	GetDistributorByAddress(ctx context.Context, distributorAddress string) (*models.SupplierModel, error)
 	GetManufacturerByAddress(ctx context.Context, manufacturerAddress string) (*models.SupplierModel, error)
+
+	IfExistsRetailerDistributor(ctx context.Context, retailerID, distributorID uuid.UUID) (bool, error)
+	IfExistsDistributorManufacturer(ctx context.Context, distributorID, manufacturerID uuid.UUID) (bool, error)
+
+	CreateRetailerDistributor(ctx context.Context, retailerID, distributorID uuid.UUID) error
+	CreateDistributorManufacturer(ctx context.Context, distributorID, manufacturerID uuid.UUID) error
 }

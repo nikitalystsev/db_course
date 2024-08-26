@@ -7,22 +7,24 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	trmsqlx "github.com/avito-tech/go-transaction-manager/drivers/sqlx/v2"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
 type ProductRepo struct {
-	db *sqlx.DB
+	db     *sqlx.DB
+	getter *trmsqlx.CtxGetter
 }
 
 func NewProductRepo(db *sqlx.DB) intfRepo.IProductRepo {
-	return &ProductRepo{db: db}
+	return &ProductRepo{db: db, getter: trmsqlx.DefaultCtxGetter}
 }
 
 func (pr *ProductRepo) Create(ctx context.Context, product *models.ProductModel) error {
 	query := `insert into ss.product values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 
-	result, err := pr.db.ExecContext(ctx, query, product.ID, product.RetailerID, product.DistributorID,
+	result, err := pr.getter.DefaultTrOrDB(ctx, pr.db).ExecContext(ctx, query, product.ID, product.RetailerID, product.DistributorID,
 		product.ManufacturerID, product.Name, product.Categories, product.Brand, product.Compound,
 		product.GrossMass, product.NetMass, product.PackageType,
 	)
@@ -44,7 +46,7 @@ func (pr *ProductRepo) GetByID(ctx context.Context, ID uuid.UUID) (*models.Produ
 	query := `select id, retailer_id, distributor_id, manufacturer_id, name, categories, brand, compound, gross_mass, net_mass, package_type from ss.product where id = $1`
 
 	var product models.ProductModel
-	err := pr.db.GetContext(ctx, &product, query, ID)
+	err := pr.getter.DefaultTrOrDB(ctx, pr.db).GetContext(ctx, &product, query, ID)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, err
 	}
@@ -58,7 +60,7 @@ func (pr *ProductRepo) GetByID(ctx context.Context, ID uuid.UUID) (*models.Produ
 func (pr *ProductRepo) DeleteByID(ctx context.Context, ID uuid.UUID) error {
 	query := `delete from ss.product where id = $1`
 
-	result, err := pr.db.ExecContext(ctx, query, ID)
+	result, err := pr.getter.DefaultTrOrDB(ctx, pr.db).ExecContext(ctx, query, ID)
 	if err != nil {
 		return err
 	}
@@ -78,7 +80,7 @@ func (pr *ProductRepo) GetPage(ctx context.Context, limit, offset int) ([]*model
 	query := `select id, retailer_id, distributor_id, manufacturer_id, name, categories, brand, compound, gross_mass, net_mass, package_type from ss.product limit $1 offset $2`
 
 	var products []*models.ProductModel
-	err := pr.db.SelectContext(ctx, &products, query, limit, offset)
+	err := pr.getter.DefaultTrOrDB(ctx, pr.db).SelectContext(ctx, &products, query, limit, offset)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, err
 	}

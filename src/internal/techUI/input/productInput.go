@@ -124,32 +124,32 @@ func PackageType() (string, error) {
 	return publisher, nil
 }
 
-func ProductParams() (dto.NewProductDTO, error) {
+func ProductParams() (dto.ProductDTO, error) {
 	var (
-		newProduct dto.NewProductDTO
+		newProduct dto.ProductDTO
 		err        error
 	)
 
 	if newProduct.Name, err = Name(); err != nil {
-		return dto.NewProductDTO{}, err
+		return dto.ProductDTO{}, err
 	}
 	if newProduct.Categories, err = Categories(); err != nil {
-		return dto.NewProductDTO{}, err
+		return dto.ProductDTO{}, err
 	}
 	if newProduct.Brand, err = Brand(); err != nil {
-		return dto.NewProductDTO{}, err
+		return dto.ProductDTO{}, err
 	}
 	if newProduct.Compound, err = Compound(); err != nil {
-		return dto.NewProductDTO{}, err
+		return dto.ProductDTO{}, err
 	}
 	if newProduct.GrossMass, err = GrossMass(); err != nil {
-		return dto.NewProductDTO{}, err
+		return dto.ProductDTO{}, err
 	}
 	if newProduct.NetMass, err = NetMass(); err != nil {
-		return dto.NewProductDTO{}, err
+		return dto.ProductDTO{}, err
 	}
 	if newProduct.PackageType, err = PackageType(); err != nil {
-		return dto.NewProductDTO{}, err
+		return dto.ProductDTO{}, err
 	}
 
 	return newProduct, nil

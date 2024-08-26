@@ -8,6 +8,7 @@ import (
 	"SmartShopper-services/intfRepo"
 	"SmartShopper-services/pkg/auth"
 	"SmartShopper-services/pkg/hash"
+	"SmartShopper-services/pkg/transact"
 	"SmartShopper/internal/config"
 	"fmt"
 	trmsqlx "github.com/avito-tech/go-transaction-manager/drivers/sqlx/v2"
@@ -23,14 +24,15 @@ func Run(configDir string) {
 	}
 
 	var (
-		userRepo        intfRepo.IUserRepo
-		productRepo     intfRepo.IProductRepo
-		ratingRepo      intfRepo.IRatingRepo
-		supplierRepo    intfRepo.ISupplierRepo
-		saleProductRepo intfRepo.ISaleProductRepo
-		promotionRepo   intfRepo.IPromotionRepo
-		shopRepo        intfRepo.IShopRepo
-		certificateRepo intfRepo.ICertificateRepo
+		userRepo           intfRepo.IUserRepo
+		productRepo        intfRepo.IProductRepo
+		ratingRepo         intfRepo.IRatingRepo
+		supplierRepo       intfRepo.ISupplierRepo
+		saleProductRepo    intfRepo.ISaleProductRepo
+		promotionRepo      intfRepo.IPromotionRepo
+		shopRepo           intfRepo.IShopRepo
+		certificateRepo    intfRepo.ICertificateRepo
+		transactionManager transact.ITransactionManager
 	)
 
 	client := redis.NewClient(&redis.Options{
@@ -71,6 +73,7 @@ func Run(configDir string) {
 	if err != nil {
 		return
 	}
+	transactionManager = transact.NewTransactionManager(trm)
 
 	hasher := hash.NewPasswordHasher(cfg.Auth.PasswordSalt)
 
@@ -93,7 +96,7 @@ func Run(configDir string) {
 		productRepo,
 		promotionRepo,
 		shopRepo,
-		trm,
+		transactionManager,
 	)
 
 	handler := handlers.NewHandler(
@@ -111,9 +114,12 @@ func Run(configDir string) {
 	)
 	router := handler.InitRoutes()
 
+	fmt.Println("Server was successfully started!")
+	fmt.Println("port: ", cfg.Port)
+
 	err = router.Run(":" + cfg.Port)
 	if err != nil {
+		println("error starting server:", err)
 		return
 	}
-	fmt.Println("Server was successfully started!")
 }

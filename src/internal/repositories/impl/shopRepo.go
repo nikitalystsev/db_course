@@ -8,22 +8,24 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	trmsqlx "github.com/avito-tech/go-transaction-manager/drivers/sqlx/v2"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
 type ShopRepo struct {
-	db *sqlx.DB
+	db     *sqlx.DB
+	getter *trmsqlx.CtxGetter
 }
 
 func NewShopRepo(db *sqlx.DB) intfRepo.IShopRepo {
-	return &ShopRepo{db: db}
+	return &ShopRepo{db: db, getter: trmsqlx.DefaultCtxGetter}
 }
 
 func (sr *ShopRepo) Create(ctx context.Context, shop *models.ShopModel) error {
 	query := `insert into ss.shop values ($1, $2, $3, $4, $5, $6)`
 
-	result, err := sr.db.ExecContext(ctx, query, shop.ID, shop.RetailerID, shop.Title,
+	result, err := sr.getter.DefaultTrOrDB(ctx, sr.db).ExecContext(ctx, query, shop.ID, shop.RetailerID, shop.Title,
 		shop.Address, shop.PhoneNumber, shop.FioDirector)
 	if err != nil {
 		return err
@@ -41,7 +43,7 @@ func (sr *ShopRepo) Create(ctx context.Context, shop *models.ShopModel) error {
 func (sr *ShopRepo) DeleteByID(ctx context.Context, ID uuid.UUID) error {
 	query := `delete from ss.shop where id = $1`
 
-	result, err := sr.db.ExecContext(ctx, query, ID)
+	result, err := sr.getter.DefaultTrOrDB(ctx, sr.db).ExecContext(ctx, query, ID)
 	if err != nil {
 		return err
 	}
@@ -61,7 +63,7 @@ func (sr *ShopRepo) GetByID(ctx context.Context, ID uuid.UUID) (*models.ShopMode
 
 	var shop models.ShopModel
 
-	err := sr.db.GetContext(ctx, &shop, query, ID)
+	err := sr.getter.DefaultTrOrDB(ctx, sr.db).GetContext(ctx, &shop, query, ID)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, err
 	}
@@ -77,7 +79,7 @@ func (sr *ShopRepo) GetByAddress(ctx context.Context, shopAddress string) (*mode
 
 	var shop models.ShopModel
 
-	err := sr.db.GetContext(ctx, &shop, query, shopAddress)
+	err := sr.getter.DefaultTrOrDB(ctx, sr.db).GetContext(ctx, &shop, query, shopAddress)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, err
 	}
@@ -99,7 +101,7 @@ func (sr *ShopRepo) GetByParams(ctx context.Context, params *dto.ShopDTO) ([]*mo
 
 	var shops []*models.ShopModel
 
-	err := sr.db.SelectContext(ctx, &shops, query,
+	err := sr.getter.DefaultTrOrDB(ctx, sr.db).SelectContext(ctx, &shops, query,
 		params.Title,
 		params.Address,
 		params.PhoneNumber,

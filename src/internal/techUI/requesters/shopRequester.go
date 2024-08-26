@@ -54,6 +54,10 @@ func (r *Requester) processShopActions() error {
 			if err = r.viewNextPage(); err != nil {
 				fmt.Printf("\n\n%s\n", err.Error())
 			}
+		case 3:
+			if err = r.adNewProductInShop(); err != nil {
+				fmt.Printf("\n\n%s\n", err.Error())
+			}
 		case 4:
 			if err = r.addRatingProductByShop(); err != nil {
 				fmt.Printf("\n\n%s\n", err.Error())
