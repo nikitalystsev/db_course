@@ -126,7 +126,6 @@ func (h *Handler) getRetailerByAddress(c *gin.Context) {
 func (h *Handler) addShop(c *gin.Context) {
 	var shopDTO dto.ShopDTO
 	if err := c.BindJSON(&shopDTO); err != nil {
-		fmt.Println("Ебаная ошибка тут")
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
@@ -142,12 +141,10 @@ func (h *Handler) addShop(c *gin.Context) {
 
 	err := h.shopService.Create(c.Request.Context(), shop)
 	if err != nil && errors.Is(err, errs.ErrShopAlreadyExist) {
-		fmt.Println("Ошибка тут StatusConflict")
 		c.AbortWithStatusJSON(http.StatusConflict, err.Error())
 		return
 	}
 	if err != nil {
-		fmt.Println("Ошибка тут StatusInternalServerError")
 		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
