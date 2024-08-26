@@ -8,4 +8,5 @@ import (
 
 type ISaleProductService interface {
 	GetByProductID(ctx context.Context, productID uuid.UUID) ([]*models.SaleProductModel, error)
+	GetByShopID(ctx context.Context, shopID uuid.UUID) ([]*models.SaleProductModel, error)
 }

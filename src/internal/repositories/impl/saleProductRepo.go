@@ -31,3 +31,18 @@ func (spr *SaleProductRepo) GetByProductID(ctx context.Context, productID uuid.U
 
 	return sales, nil
 }
+
+func (spr *SaleProductRepo) GetByShopID(ctx context.Context, shopID uuid.UUID) ([]*models.SaleProductModel, error) {
+	query := `select id, shop_id, product_id, promotion_id, price, currency, setting_date, avg_rating from ss.sale_product where shop_id = $1`
+
+	var sales []*models.SaleProductModel
+	err := spr.db.SelectContext(ctx, &sales, query, shopID)
+	if err != nil {
+		return nil, err
+	}
+	if len(sales) == 0 {
+		return nil, errs.ErrSaleProductDoesNotExists
+	}
+
+	return sales, nil
+}

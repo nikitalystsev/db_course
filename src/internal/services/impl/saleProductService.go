@@ -30,3 +30,16 @@ func (sps *SaleProductService) GetByProductID(ctx context.Context, productID uui
 
 	return sales, nil
 }
+
+func (sps *SaleProductService) GetByShopID(ctx context.Context, shopID uuid.UUID) ([]*models.SaleProductModel, error) {
+	sales, err := sps.saleProductRepo.GetByShopID(ctx, shopID)
+	if err != nil && !errors.Is(err, errs.ErrSaleProductDoesNotExists) {
+		return nil, err
+	}
+
+	if errors.Is(err, errs.ErrSaleProductDoesNotExists) {
+		return nil, errs.ErrSaleProductDoesNotExists
+	}
+
+	return sales, nil
+}

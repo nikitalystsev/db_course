@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -108,4 +109,24 @@ func ShopParams() (dto.ShopDTO, error) {
 	shop.RetailerID = uuid.Nil
 
 	return shop, nil
+}
+
+func ShopPagesNumber() (int, error) {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Printf("Введите номер магазина из списка: ")
+
+	numStr, err := reader.ReadString('\n')
+	if err != nil {
+		return 0, err
+	}
+
+	numStr = strings.TrimSpace(numStr)
+
+	numInt, err := strconv.Atoi(numStr)
+	if err != nil {
+		return 0, err
+	}
+
+	return numInt, nil
 }

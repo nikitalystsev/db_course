@@ -53,6 +53,10 @@ func (r *Requester) processShopActions() error {
 			if err = r.viewNextPage(); err != nil {
 				fmt.Printf("\n\n%s\n", err.Error())
 			}
+		case 4:
+			if err = r.addRatingProductByShop(); err != nil {
+				fmt.Printf("\n\n%s\n", err.Error())
+			}
 		case 0:
 			return nil
 		default:
@@ -200,6 +204,64 @@ func (r *Requester) viewNextPage() error {
 	return nil
 }
 
+func (r *Requester) addRatingProductByShop() error {
+	var shopPagesID []uuid.UUID
+	if err := r.cache.Get(shopsKey, &shopPagesID); err != nil {
+		return err
+	}
+
+	var tokens dto.UserTokensDTO
+	if err := r.cache.Get(tokensKey, &tokens); err != nil {
+		return err
+	}
+
+	num, err := input.ShopPagesNumber()
+	if err != nil {
+		return err
+	}
+
+	if num > len(shopPagesID)-1 || num < 0 { // num -- это индекс
+		return errors.New("номер магазина выходит из диапазона выведенных значений")
+	}
+
+	shopID := shopPagesID[num]
+
+	fmt.Println("shopID: ", shopID)
+
+	request := HTTPRequest{
+		Method: http.MethodGet,
+		URL:    r.baseURL + "/api/sales",
+		Headers: map[string]string{
+			"Content-Type":  "application/json",
+			"Authorization": fmt.Sprintf("Bearer %s", tokens.AccessToken),
+		},
+		QueryParams: map[string]string{
+			"shop_id": shopID.String(),
+		},
+		Timeout: 10 * time.Second,
+	}
+
+	response, err := SendRequest(request)
+	if err != nil {
+		return err
+	}
+	if response.StatusCode != http.StatusOK {
+		var info string
+		if err = json.Unmarshal(response.Body, &info); err != nil {
+			return err
+		}
+		return errors.New(info)
+	}
+	var sales []*dto.SaleProductShopDTO
+	if err = json.Unmarshal(response.Body, &sales); err != nil {
+		return err
+	}
+
+	printShopSales(sales, num)
+
+	return nil
+}
+
 func printShops(shops []*models.ShopModel, offset int) {
 	t := table.NewWriter()
 	t.SetTitle(fmt.Sprintf("Страница магазинов №%d", offset/pageLimit+1))
@@ -217,4 +279,51 @@ func copyShopIDsToArray(shopIDs *[]uuid.UUID, shops []*models.ShopModel) {
 	for _, shop := range shops {
 		*shopIDs = append(*shopIDs, shop.ID)
 	}
+}
+
+func printShopSales(salesDTO []*dto.SaleProductShopDTO, num int) {
+	t := table.NewWriter()
+	t.SetTitle(fmt.Sprintf("Товары, продающиеся в магазине №%d", num))
+	t.SetStyle(table.StyleBold)
+	t.Style().Format.Header = text.FormatTitle
+	t.AppendHeader(
+		table.Row{"No.",
+			"Название товара",
+			"Категория",
+			"Тип акции",
+			"Размер скидки",
+			"Цена",
+			"Валюта",
+			"Средний рейтинг",
+		},
+	)
+
+	for i, saleProduct := range salesDTO {
+		var discountSize string
+		if saleProduct.PromotionDiscountSize == nil {
+			discountSize = fmt.Sprintf("%d", 0)
+		} else {
+			discountSize = fmt.Sprintf("%d", *saleProduct.PromotionDiscountSize)
+		}
+		var avgRating string
+		if saleProduct.AvgRating == nil {
+			avgRating = "Не оценен"
+		} else {
+			avgRating = fmt.Sprintf("%f", *saleProduct.AvgRating)
+		}
+		t.AppendRow(
+			table.Row{
+				i,
+				saleProduct.ProductName,
+				saleProduct.ProductCategories,
+				saleProduct.PromotionType,
+				discountSize,
+				saleProduct.Price,
+				saleProduct.Currency,
+				avgRating,
+			},
+		)
+	}
+
+	fmt.Println(t.Render())
 }
