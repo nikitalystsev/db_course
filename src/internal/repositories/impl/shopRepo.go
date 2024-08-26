@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"SmartShopper-services/core/dto"
 	"SmartShopper-services/core/models"
 	"SmartShopper-services/errs"
 	"SmartShopper-services/intfRepo"
@@ -85,4 +86,35 @@ func (sr *ShopRepo) GetByAddress(ctx context.Context, shopAddress string) (*mode
 	}
 
 	return &shop, nil
+}
+
+func (sr *ShopRepo) GetByParams(ctx context.Context, params *dto.ShopDTO) ([]*models.ShopModel, error) {
+	query := `select id, retailer_id, title, address, phone_number, fio_director 
+			  from ss.shop 
+	          where ($1 = '' or title ilike '%' || $1 || '%') and 
+	                ($2 = '' or address ilike '%' || $2 || '%') and 
+	                ($3 = '' or phone_number ilike '%' || $3 || '%') and 
+	                ($4 = '' or fio_director ilike '%' || $4 || '%')
+	          limit $5 offset $6`
+
+	var shops []*models.ShopModel
+
+	err := sr.db.SelectContext(ctx, &shops, query,
+		params.Title,
+		params.Address,
+		params.PhoneNumber,
+		params.FioDirector,
+		params.Limit,
+		params.Offset,
+	)
+
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	if len(shops) == 0 {
+		return nil, errs.ErrShopDoesNotExists
+	}
+
+	return shops, nil
 }

@@ -9,23 +9,23 @@ import (
 	"strings"
 )
 
-func IsWithParams() (bool, error) {
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Printf("Would you like to enter search parameters?(Y/N): ")
-
-	isWithParams, err := reader.ReadString('\n')
-	if err != nil {
-		return false, err
-	}
-
-	isWithParams = strings.TrimSpace(isWithParams)
-	if isWithParams != "y" && isWithParams != "Y" {
-		return true, nil
-	}
-
-	return false, nil
-}
+//func IsWithParams() (bool, error) {
+//	reader := bufio.NewReader(os.Stdin)
+//
+//	fmt.Printf("Would you like to enter search parameters?(Y/N): ")
+//
+//	isWithParams, err := reader.ReadString('\n')
+//	if err != nil {
+//		return false, err
+//	}
+//
+//	isWithParams = strings.TrimSpace(isWithParams)
+//	if isWithParams != "y" && isWithParams != "Y" {
+//		return true, nil
+//	}
+//
+//	return false, nil
+//}
 
 func RetailerTitle() (string, error) {
 	reader := bufio.NewReader(os.Stdin)

@@ -1,8 +1,10 @@
 package impl
 
 import (
+	"SmartShopper-services/core/dto"
 	"SmartShopper-services/core/models"
 	"SmartShopper-services/errs"
+	"SmartShopper-services/intf"
 	"SmartShopper-services/intfRepo"
 	"context"
 	"errors"
@@ -13,7 +15,7 @@ type ShopService struct {
 	shopRepo intfRepo.IShopRepo
 }
 
-func NewShopService(shopRepo intfRepo.IShopRepo) *ShopService {
+func NewShopService(shopRepo intfRepo.IShopRepo) intf.IShopService {
 	return &ShopService{shopRepo: shopRepo}
 }
 
@@ -64,4 +66,17 @@ func (ss *ShopService) DeleteByID(ctx context.Context, ID uuid.UUID) error {
 	}
 
 	return nil
+}
+
+func (ss *ShopService) GetByParams(ctx context.Context, params *dto.ShopDTO) ([]*models.ShopModel, error) {
+	shops, err := ss.shopRepo.GetByParams(ctx, params)
+	if err != nil && !errors.Is(err, errs.ErrShopDoesNotExists) {
+		return nil, err
+	}
+
+	if errors.Is(err, errs.ErrShopDoesNotExists) {
+		return nil, errs.ErrShopDoesNotExists
+	}
+
+	return shops, nil
 }

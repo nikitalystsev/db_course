@@ -81,6 +81,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		registered.POST("/retailers", h.addRetailerIfNotExist)
 		registered.GET("/retailers", h.getRetailerByAddress)
 		registered.POST("/shops", h.addShop)
+		registered.GET("/shops", h.getShops)
 	}
 	return router
 }

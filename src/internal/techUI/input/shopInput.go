@@ -9,6 +9,24 @@ import (
 	"strings"
 )
 
+func IsWithParams() (bool, error) {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Printf("Хотите ли вы ввести параметры поиска?(Y/N): ")
+
+	isWithParams, err := reader.ReadString('\n')
+	if err != nil {
+		return false, err
+	}
+
+	isWithParams = strings.TrimSpace(isWithParams)
+	if isWithParams != "n" && isWithParams != "N" {
+		return true, nil
+	}
+
+	return false, nil
+}
+
 func ShopTitle() (string, error) {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -69,25 +87,25 @@ func ShopFioDirector() (string, error) {
 	return rarity, nil
 }
 
-func ShopParams() (*dto.ShopDTO, error) {
+func ShopParams() (dto.ShopDTO, error) {
 	var (
 		shop dto.ShopDTO
 		err  error
 	)
 
 	if shop.Title, err = ShopTitle(); err != nil {
-		return nil, err
+		return dto.ShopDTO{}, err
 	}
 	if shop.Address, err = ShopAddress(); err != nil {
-		return nil, err
+		return dto.ShopDTO{}, err
 	}
 	if shop.PhoneNumber, err = ShopPhoneNumber(); err != nil {
-		return nil, err
+		return dto.ShopDTO{}, err
 	}
 	if shop.FioDirector, err = ShopFioDirector(); err != nil {
-		return nil, err
+		return dto.ShopDTO{}, err
 	}
 	shop.RetailerID = uuid.Nil
 
-	return &shop, nil
+	return shop, nil
 }

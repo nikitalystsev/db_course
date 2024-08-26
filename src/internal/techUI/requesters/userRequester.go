@@ -14,6 +14,7 @@ import (
 const userMainMenu = `Главное меню:
 	1 -- Перейти в каталог товаров
 	2 -- Добавить новый магазин
+	3 -- Перейти к обработке магазинов
 	0 -- выйти
 `
 const tokensKey = "tokens"
@@ -46,6 +47,10 @@ func (r *Requester) processUserActions() error {
 			if err = r.addNewShop(); err != nil {
 				fmt.Printf("\n\n%s\n", err.Error())
 			}
+		case 3:
+			if err = r.processShopActions(); err != nil {
+				fmt.Printf("\n\n%s\n", err.Error())
+			}
 		case 0:
 			close(stopRefresh)
 			r.cache.Delete("tokens")
@@ -56,8 +61,8 @@ func (r *Requester) processUserActions() error {
 		}
 
 	}
-
 }
+
 func (r *Requester) addNewShop() error {
 	var tokens dto.UserTokensDTO
 	if err := r.cache.Get(tokensKey, &tokens); err != nil {
