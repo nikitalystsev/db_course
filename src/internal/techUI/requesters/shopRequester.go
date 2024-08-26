@@ -382,6 +382,170 @@ func (r *Requester) changePriceOnsaleProduct() error {
 	return nil
 }
 
+func (r *Requester) addNewDistributorIfNotExist(tokens dto.UserTokensDTO) (uuid.UUID, error) {
+	distributorDTO, err := input.DistributorParams()
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	request := HTTPRequest{
+		Method: http.MethodPost,
+		URL:    r.baseURL + "/api/",
+		Headers: map[string]string{
+			"Content-Type":  "application/json",
+			"Authorization": fmt.Sprintf("Bearer %s", tokens.AccessToken),
+		},
+		Body:    distributorDTO,
+		Timeout: 10 * time.Second,
+	}
+
+	response, err := SendRequest(request)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	if response.StatusCode == http.StatusConflict {
+		var distributorID uuid.UUID
+		distributorID, err = r.getDistributorByAddress(tokens, distributorDTO.Address)
+		if err != nil {
+			return uuid.Nil, err
+		}
+		return distributorID, nil
+	}
+
+	if response.StatusCode == http.StatusInternalServerError || response.StatusCode == http.StatusBadRequest {
+		var info string
+		if err = json.Unmarshal(response.Body, &info); err != nil {
+			return uuid.Nil, err
+		}
+		return uuid.Nil, errors.New(info)
+	}
+
+	var distributorID uuid.UUID
+	if err = json.Unmarshal(response.Body, &distributorID); err != nil {
+		return uuid.Nil, err
+	}
+
+	return distributorID, nil
+}
+
+func (r *Requester) getDistributorByAddress(tokens dto.UserTokensDTO, address string) (uuid.UUID, error) {
+	request := HTTPRequest{
+		Method: http.MethodGet,
+		URL:    r.baseURL + "/api/",
+		Headers: map[string]string{
+			"Content-Type":  "application/json",
+			"Authorization": fmt.Sprintf("Bearer %s", tokens.AccessToken),
+		},
+		QueryParams: map[string]string{
+			"address": address,
+		},
+		Timeout: 10 * time.Second,
+	}
+
+	response, err := SendRequest(request)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		var info string
+		if err = json.Unmarshal(response.Body, &info); err != nil {
+			return uuid.Nil, err
+		}
+		return uuid.Nil, errors.New(info)
+	}
+
+	var distributorID uuid.UUID
+	if err = json.Unmarshal(response.Body, &distributorID); err != nil {
+		return uuid.Nil, err
+	}
+
+	return distributorID, nil
+}
+
+func (r *Requester) addNewManufacturerIfNotExist(tokens dto.UserTokensDTO) (uuid.UUID, error) {
+	manufacturerDTO, err := input.DistributorParams()
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	request := HTTPRequest{
+		Method: http.MethodPost,
+		URL:    r.baseURL + "/api/",
+		Headers: map[string]string{
+			"Content-Type":  "application/json",
+			"Authorization": fmt.Sprintf("Bearer %s", tokens.AccessToken),
+		},
+		Body:    manufacturerDTO,
+		Timeout: 10 * time.Second,
+	}
+
+	response, err := SendRequest(request)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	if response.StatusCode == http.StatusConflict {
+		var manufacturerID uuid.UUID
+		manufacturerID, err = r.getManufacturerByAddress(tokens, manufacturerDTO.Address)
+		if err != nil {
+			return uuid.Nil, err
+		}
+		return manufacturerID, nil
+	}
+
+	if response.StatusCode == http.StatusInternalServerError || response.StatusCode == http.StatusBadRequest {
+		var info string
+		if err = json.Unmarshal(response.Body, &info); err != nil {
+			return uuid.Nil, err
+		}
+		return uuid.Nil, errors.New(info)
+	}
+
+	var manufacturerID uuid.UUID
+	if err = json.Unmarshal(response.Body, &manufacturerID); err != nil {
+		return uuid.Nil, err
+	}
+
+	return manufacturerID, nil
+}
+
+func (r *Requester) getManufacturerByAddress(tokens dto.UserTokensDTO, address string) (uuid.UUID, error) {
+	request := HTTPRequest{
+		Method: http.MethodGet,
+		URL:    r.baseURL + "/api/",
+		Headers: map[string]string{
+			"Content-Type":  "application/json",
+			"Authorization": fmt.Sprintf("Bearer %s", tokens.AccessToken),
+		},
+		QueryParams: map[string]string{
+			"address": address,
+		},
+		Timeout: 10 * time.Second,
+	}
+
+	response, err := SendRequest(request)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		var info string
+		if err = json.Unmarshal(response.Body, &info); err != nil {
+			return uuid.Nil, err
+		}
+		return uuid.Nil, errors.New(info)
+	}
+
+	var manufacturerID uuid.UUID
+	if err = json.Unmarshal(response.Body, &manufacturerID); err != nil {
+		return uuid.Nil, err
+	}
+
+	return manufacturerID, nil
+}
+
 func printShops(shops []*models.ShopModel, offset int) {
 	t := table.NewWriter()
 	t.SetTitle(fmt.Sprintf("Страница магазинов №%d", offset/pageLimit+1))

@@ -5,7 +5,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -108,98 +107,164 @@ func RetailerParams() (*dto.SupplierDTO, error) {
 	return &retailer, nil
 }
 
-func Genre() (string, error) {
+func DistributorTitle() (string, error) {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Printf("Input genre: ")
+	fmt.Printf("Введите название Дистрибьютора: ")
 
-	genre, err := reader.ReadString('\n')
+	retailerTitle, err := reader.ReadString('\n')
 	if err != nil {
 		return "", err
 	}
 
-	genre = strings.TrimSpace(genre)
+	retailerTitle = strings.TrimSpace(retailerTitle)
 
-	return genre, nil
+	return retailerTitle, nil
 }
 
-func PublishingYear() (uint, error) {
+func DistributorAddress() (string, error) {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Printf("Input publishing year: ")
+	fmt.Printf("Введите адрес Дистрибьютора: ")
 
-	yearStr, err := reader.ReadString('\n')
-	if err != nil {
-		return 0, err
-	}
-
-	yearStr = strings.TrimSpace(yearStr)
-
-	yearInt, err := strconv.Atoi(yearStr)
-	if err != nil {
-		return 0, err
-	}
-
-	year := uint(yearInt)
-
-	return year, nil
-}
-
-func Language() (string, error) {
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Printf("Input language: ")
-
-	language, err := reader.ReadString('\n')
+	author, err := reader.ReadString('\n')
 	if err != nil {
 		return "", err
 	}
 
-	language = strings.TrimSpace(language)
+	author = strings.TrimSpace(author)
 
-	return language, nil
+	return author, nil
 }
 
-func AgeLimit() (uint, error) {
+func DistributorPhoneNumber() (string, error) {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Printf("Input age limit: ")
+	fmt.Printf("Введите номер телефона Дистрибьютора: ")
 
-	ageLimitStr, err := reader.ReadString('\n')
+	publisher, err := reader.ReadString('\n')
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
-	ageLimitStr = strings.TrimSpace(ageLimitStr)
+	publisher = strings.TrimSpace(publisher)
 
-	ageLimitInt, err := strconv.Atoi(ageLimitStr)
-	if err != nil {
-		return 0, err
-	}
-
-	ageLimit := uint(ageLimitInt)
-
-	return ageLimit, nil
+	return publisher, nil
 }
 
-func CopiesNumber() (uint, error) {
+func DistributorFioRepresentative() (string, error) {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Printf("Input book's copies number: ")
+	fmt.Printf("Введите ФИО представителя: ")
 
-	copiesNumStr, err := reader.ReadString('\n')
+	rarity, err := reader.ReadString('\n')
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
-	copiesNumStr = strings.TrimSpace(copiesNumStr)
+	rarity = strings.TrimSpace(rarity)
 
-	copiesNumInt, err := strconv.Atoi(copiesNumStr)
+	return rarity, nil
+}
+
+func DistributorParams() (*dto.SupplierDTO, error) {
+	var (
+		retailer dto.SupplierDTO
+		err      error
+	)
+
+	if retailer.Title, err = DistributorTitle(); err != nil {
+		return nil, err
+	}
+	if retailer.Address, err = DistributorAddress(); err != nil {
+		return nil, err
+	}
+	if retailer.PhoneNumber, err = DistributorPhoneNumber(); err != nil {
+		return nil, err
+	}
+	if retailer.FioRepresentative, err = DistributorFioRepresentative(); err != nil {
+		return nil, err
+	}
+	return &retailer, nil
+}
+
+func ManufacturerTitle() (string, error) {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Printf("Введите название Производителя: ")
+
+	retailerTitle, err := reader.ReadString('\n')
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
-	copiesNum := uint(copiesNumInt)
+	retailerTitle = strings.TrimSpace(retailerTitle)
 
-	return copiesNum, nil
+	return retailerTitle, nil
+}
+
+func ManufacturerAddress() (string, error) {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Printf("Введите адрес Производителя: ")
+
+	author, err := reader.ReadString('\n')
+	if err != nil {
+		return "", err
+	}
+
+	author = strings.TrimSpace(author)
+
+	return author, nil
+}
+
+func ManufacturerPhoneNumber() (string, error) {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Printf("Введите номер телефона Производителя: ")
+
+	publisher, err := reader.ReadString('\n')
+	if err != nil {
+		return "", err
+	}
+
+	publisher = strings.TrimSpace(publisher)
+
+	return publisher, nil
+}
+
+func ManufacturerFioRepresentative() (string, error) {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Printf("Введите ФИО представителя: ")
+
+	rarity, err := reader.ReadString('\n')
+	if err != nil {
+		return "", err
+	}
+
+	rarity = strings.TrimSpace(rarity)
+
+	return rarity, nil
+}
+
+func ManufacturerParams() (*dto.SupplierDTO, error) {
+	var (
+		retailer dto.SupplierDTO
+		err      error
+	)
+
+	if retailer.Title, err = ManufacturerTitle(); err != nil {
+		return nil, err
+	}
+	if retailer.Address, err = ManufacturerAddress(); err != nil {
+		return nil, err
+	}
+	if retailer.PhoneNumber, err = ManufacturerPhoneNumber(); err != nil {
+		return nil, err
+	}
+	if retailer.FioRepresentative, err = ManufacturerFioRepresentative(); err != nil {
+		return nil, err
+	}
+	return &retailer, nil
 }

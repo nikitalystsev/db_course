@@ -193,3 +193,35 @@ func (sr *SupplierRepo) GetRetailerByAddress(ctx context.Context, retailerAddres
 
 	return &retailer, nil
 }
+
+func (sr *SupplierRepo) GetDistributorByAddress(ctx context.Context, distributorAddress string) (*models.SupplierModel, error) {
+	query := `select id, title, address, phone_number, fio_representative from ss.distributor where address = $1`
+
+	var distributor models.SupplierModel
+	err := sr.db.GetContext(ctx, &distributor, query, distributorAddress)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, errs.ErrRetailerDoesNotExists
+	}
+
+	return &distributor, nil
+}
+
+func (sr *SupplierRepo) GetManufacturerByAddress(ctx context.Context, manufacturerAddress string) (*models.SupplierModel, error) {
+	query := `select id, title, address, phone_number, fio_representative from ss.manufacturer where address = $1`
+
+	var manufacturer models.SupplierModel
+	err := sr.db.GetContext(ctx, &manufacturer, query, manufacturerAddress)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, errs.ErrRetailerDoesNotExists
+	}
+
+	return &manufacturer, nil
+}

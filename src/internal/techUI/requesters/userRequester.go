@@ -68,6 +68,10 @@ func (r *Requester) addNewShop() error {
 	if err := r.cache.Get(tokensKey, &tokens); err != nil {
 		return err
 	}
+
+	fmt.Printf("\n\nДля добавления нового магазина необходимо ввести " +
+		"данные Ритейлера, с которым он сотрудничает\n")
+
 	retailerID, err := r.addNewRetailerIfNotExist(tokens)
 	if err != nil {
 		return err
@@ -110,9 +114,6 @@ func (r *Requester) addNewShop() error {
 }
 
 func (r *Requester) addNewRetailerIfNotExist(tokens dto.UserTokensDTO) (uuid.UUID, error) {
-	fmt.Printf("\n\nДля добавления нового магазина необходимо ввести " +
-		"данные Ритейлера, с которым он сотрудничает\n")
-
 	retailerDTO, err := input.RetailerParams()
 	if err != nil {
 		return uuid.Nil, err
@@ -193,6 +194,7 @@ func (r *Requester) getRetailerByAddress(tokens dto.UserTokensDTO, address strin
 
 	return retailerID, nil
 }
+
 func (r *Requester) signIn(stopRefresh <-chan struct{}) error {
 	readerSignInDTO, err := input.SignInParams()
 	if err != nil {

@@ -177,3 +177,29 @@ func (ss *SupplierService) GetRetailerByAddress(ctx context.Context, retailerAdd
 
 	return existingRetailer, nil
 }
+
+func (ss *SupplierService) GetDistributorByAddress(ctx context.Context, distributorAddress string) (*models.SupplierModel, error) {
+	existingDistributor, err := ss.supplierRepo.GetDistributorByAddress(ctx, distributorAddress)
+	if err != nil && !errors.Is(err, errs.ErrDistributorDoesNotExists) {
+		return nil, err
+	}
+
+	if existingDistributor == nil {
+		return nil, errs.ErrDistributorDoesNotExists
+	}
+
+	return existingDistributor, nil
+}
+
+func (ss *SupplierService) GetManufacturerByAddress(ctx context.Context, manufacturerAddress string) (*models.SupplierModel, error) {
+	existingManufacturer, err := ss.supplierRepo.GetManufacturerByAddress(ctx, manufacturerAddress)
+	if err != nil && !errors.Is(err, errs.ErrRetailerDoesNotExists) {
+		return nil, err
+	}
+
+	if existingManufacturer == nil {
+		return nil, errs.ErrRetailerDoesNotExists
+	}
+
+	return existingManufacturer, nil
+}

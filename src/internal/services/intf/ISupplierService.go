@@ -20,4 +20,6 @@ type ISupplierService interface {
 	DeleteManufacturerByID(ctx context.Context, manufacturerID uuid.UUID) error
 
 	GetRetailerByAddress(ctx context.Context, retailerAddress string) (*models.SupplierModel, error)
+	GetDistributorByAddress(ctx context.Context, distributorAddress string) (*models.SupplierModel, error)
+	GetManufacturerByAddress(ctx context.Context, manufacturerAddress string) (*models.SupplierModel, error)
 }
