@@ -47,7 +47,7 @@ func (r *Requester) processUserActions() error {
 				fmt.Printf("\n\n%s\n", err.Error())
 			}
 		case 3:
-			if err = r.processShopActions(); err != nil {
+			if err = r.processShopCatalogActions(); err != nil {
 				fmt.Printf("\n\n%s\n", err.Error())
 			}
 		case 0:

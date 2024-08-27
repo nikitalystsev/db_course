@@ -14,7 +14,8 @@ import (
 const mainMenu = `Главное меню:
 	1 -- Зарегистрироваться
 	2 -- Войти
-	3 -- Перейти к каталогу товаров
+	3 -- Войти как администратор
+	4 -- Перейти к каталогу товаров
 	0 -- Остановить выполнение программы
 `
 
@@ -56,7 +57,7 @@ func (r *Requester) Run() {
 			if err = r.processUserActions(); err != nil {
 				fmt.Printf("\n\n%s\n", err.Error())
 			}
-		case 3:
+		case 4:
 			if err = r.processCatalogActions(); err != nil {
 				fmt.Printf("\n\n%s\n", err.Error())
 			}
