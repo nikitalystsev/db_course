@@ -22,12 +22,9 @@ func NewRatingRepo(db *sqlx.DB) intfRepo.IRatingRepo {
 func (rr *RatingRepo) Create(ctx context.Context, rating *models.RatingModel) error {
 	query := `insert into ss.rating values ($1, $2, $3, $4, $5)`
 
-	println("пытаемся создать отзыв")
-
 	result, err := rr.db.ExecContext(ctx, query, rating.ID, rating.UserID,
 		rating.SaleProductID, rating.Review, rating.Rating)
 	if err != nil {
-		println("ошибка insert")
 		return err
 	}
 
@@ -39,27 +36,20 @@ func (rr *RatingRepo) Create(ctx context.Context, rating *models.RatingModel) er
 		return errors.New("ratingRepo.Create expected 1 row affected")
 	}
 
-	println("все ок, создали")
-
 	return nil
 }
 
 func (rr *RatingRepo) GetByUserAndSale(ctx context.Context, userID, saleID uuid.UUID) (*models.RatingModel, error) {
 	query := `select id, user_id, sale_product_id, review, rating from ss.rating where user_id = $1 and sale_product_id = $2`
 
-	println("пытаемся получить GetByUserAndSale ")
 	var rating models.RatingModel
 	err := rr.db.GetContext(ctx, &rating, query, userID, saleID)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		println("ошибка запроса есть")
 		return nil, err
 	}
 	if errors.Is(err, sql.ErrNoRows) {
-		println("не найден")
 		return nil, errs.ErrRatingDoesNotExists
 	}
-
-	println("возвращаем что то")
 
 	return &rating, nil
 }

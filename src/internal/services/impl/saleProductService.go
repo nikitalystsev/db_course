@@ -9,7 +9,6 @@ import (
 	"SmartShopper-services/pkg/transact"
 	"context"
 	"errors"
-	"fmt"
 	"github.com/google/uuid"
 )
 
@@ -47,20 +46,15 @@ type SupplierIDs struct {
 }
 
 func (sps *SaleProductService) Create(ctx context.Context, saleProduct *dto.NewSaleProductDTO) error {
-	fmt.Println("call Create")
 	return sps.transactionManager.Do(ctx, func(ctx context.Context) error {
-		fmt.Println("call inner func")
 		supplierIDs, err := sps.addSuppliersIfNotExists(ctx, saleProduct.ShopID, saleProduct.Suppliers)
 		if err != nil {
 			return err
 		}
-		fmt.Println("Добавили поставщиков")
 		productID, err := sps.addProductIfNotExists(ctx, supplierIDs, saleProduct.Product)
 		if err != nil {
-			fmt.Println("НЕ Добавили товар")
 			return err
 		}
-		fmt.Println("Добавили товар")
 
 		promotionID, err := sps.addPromotionIfNotExists(ctx, saleProduct.Promotion)
 		if err != nil {
@@ -135,8 +129,6 @@ func (sps *SaleProductService) Update(ctx context.Context, saleProduct *models.S
 }
 
 func (sps *SaleProductService) addSuppliersIfNotExists(ctx context.Context, shopID uuid.UUID, suppliers [2]*dto.SupplierDTO) (SupplierIDs, error) {
-	fmt.Println("call addSuppliersIfNotExists")
-
 	var (
 		supplierIDs SupplierIDs
 		err         error
@@ -146,31 +138,26 @@ func (sps *SaleProductService) addSuppliersIfNotExists(ctx context.Context, shop
 		return SupplierIDs{}, err
 	}
 
-	fmt.Println("Добавили ритейлера")
-
 	supplierIDs.distributorID, err = sps.addDistributorIfNotExists(ctx, suppliers[0])
 	if err != nil {
 		return SupplierIDs{}, err
 	}
-	fmt.Println("Добавили 2")
 
 	supplierIDs.manufacturerID, err = sps.addManufacturerIfNotExists(ctx, suppliers[1])
 	if err != nil {
 		return SupplierIDs{}, err
 	}
 
-	fmt.Println("Добавили 3")
 	err = sps.addRetailerDistributorIfNotExists(ctx, supplierIDs.retailerID, supplierIDs.distributorID)
 	if err != nil {
 		return SupplierIDs{}, err
 	}
-	fmt.Println("Добавили связь 1")
+
 	err = sps.addDistributorManufacturerIfNotExists(ctx, supplierIDs.distributorID, supplierIDs.manufacturerID)
 	if err != nil {
 		return SupplierIDs{}, err
 	}
 
-	fmt.Println("Добавили связь 2")
 	return supplierIDs, nil
 }
 
@@ -238,24 +225,19 @@ func (sps *SaleProductService) addManufacturerIfNotExists(ctx context.Context, m
 }
 
 func (sps *SaleProductService) addRetailerDistributorIfNotExists(ctx context.Context, retailerID, distributorID uuid.UUID) error {
-	fmt.Println("call addRetailerDistributorIfNotExists")
 	isExist, err := sps.supplierRepo.IfExistsRetailerDistributor(ctx, retailerID, distributorID)
 	if err != nil {
-		fmt.Println("Ошибка выполнения запроса")
 		return err
 	}
 	if isExist {
-		fmt.Println("Существуют")
 		return nil
 	}
 
-	fmt.Println("Создаем")
-
 	err = sps.supplierRepo.CreateRetailerDistributor(ctx, retailerID, distributorID)
 	if err != nil {
-		fmt.Println("Хуево создали, блять")
 		return err
 	}
+
 	return nil
 }
 

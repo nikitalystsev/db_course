@@ -7,7 +7,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"time"
@@ -60,11 +59,8 @@ func (ur *UserRepo) GetByPhoneNumber(ctx context.Context, phoneNumber string) (*
 
 func (ur *UserRepo) SaveRefreshToken(ctx context.Context, id uuid.UUID, token string, ttl time.Duration) error {
 	if err := ur.client.Set(ctx, token, id.String(), ttl).Err(); err != nil {
-		fmt.Println("Ошибка сохранения")
 		return err
 	}
-
-	fmt.Println("Успешно сохранили!")
 
 	return nil
 }
@@ -75,7 +71,6 @@ func (ur *UserRepo) GetByRefreshToken(ctx context.Context, refreshToken string) 
 		return nil, err
 	}
 	if errors.Is(err, redis.Nil) {
-		fmt.Println("Нет пользователя")
 		return nil, errs.ErrUserDoesNotExists
 	}
 

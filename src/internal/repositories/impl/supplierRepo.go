@@ -230,23 +230,17 @@ func (sr *SupplierRepo) GetManufacturerByAddress(ctx context.Context, manufactur
 }
 
 func (sr *SupplierRepo) IfExistsRetailerDistributor(ctx context.Context, retailerID, distributorID uuid.UUID) (bool, error) {
-	fmt.Println("Дрочим на IfExistsRetailerDistributor")
-
 	fmt.Println(retailerID.String(), " ", distributorID.String())
 	query := `select retailer_id, distributor_id from ss.retailer_distributor where retailer_id = $1 and distributor_id = $2`
 
 	var ids models.RetailerDistributorModel
 	err := sr.getter.DefaultTrOrDB(ctx, sr.db).GetContext(ctx, &ids, query, retailerID, distributorID)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		fmt.Println("ебаная женская писечка")
 		return false, err
 	}
 	if errors.Is(err, sql.ErrNoRows) {
-		fmt.Println("нету, бля")
 		return false, nil
 	}
-
-	fmt.Println("есть")
 
 	return true, nil
 }
@@ -267,25 +261,19 @@ func (sr *SupplierRepo) IfExistsDistributorManufacturer(ctx context.Context, dis
 }
 
 func (sr *SupplierRepo) CreateRetailerDistributor(ctx context.Context, retailerID, distributorID uuid.UUID) error {
-	fmt.Println("call CreateRetailerDistributor")
-
 	query := `insert into ss.retailer_distributor values ($1, $2)`
 
 	result, err := sr.getter.DefaultTrOrDB(ctx, sr.db).ExecContext(ctx, query, retailerID, distributorID)
 	if err != nil {
-		fmt.Println("Ошибка, блять")
 		return err
 	}
 	rows, err := result.RowsAffected()
 	if err != nil {
-		fmt.Println("Че сука еще то надо")
 		return err
 	}
 	if rows != 1 {
 		return errors.New("supplierRepo.CreateRetailerDistributor expected 1 row affected")
 	}
-
-	fmt.Println("все тип топ")
 
 	return nil
 }

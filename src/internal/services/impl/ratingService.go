@@ -7,7 +7,6 @@ import (
 	"SmartShopper-services/intfRepo"
 	"context"
 	"errors"
-	"fmt"
 	"github.com/google/uuid"
 )
 
@@ -21,24 +20,15 @@ func NewRatingService(ratingRepo intfRepo.IRatingRepo) intf.IRatingService {
 
 func (rs *RatingService) Create(ctx context.Context, rating *models.RatingModel) error {
 	if rating == nil {
-		println("указатель на модель рейтинга нулевая")
 		return errors.New("rating is nil")
 	}
 
-	println("указатель на модель рейтинга не нулевая")
-	fmt.Printf("userID, saleID: %s, %s\n", rating.UserID, rating.SaleProductID)
-	println("посмотрели...")
-
 	existingRating, err := rs.ratingRepo.GetByUserAndSale(ctx, rating.UserID, rating.SaleProductID)
 	if err != nil && !errors.Is(err, errs.ErrRatingDoesNotExists) {
-		println("ошибка выполнения запроса в сервисе")
 		return err
 	}
 
-	println("пытались получить рейтинг по юзеру и айдишнику продажи")
-
 	if existingRating != nil {
-		println("уже есть рейтинг в сервисе")
 		return errs.ErrRatingAlreadyExist
 	}
 
