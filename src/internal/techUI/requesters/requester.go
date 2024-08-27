@@ -57,6 +57,10 @@ func (r *Requester) Run() {
 			if err = r.processUserActions(); err != nil {
 				fmt.Printf("\n\n%s\n", err.Error())
 			}
+		case 3:
+			if err = r.processAdminActions(); err != nil {
+				fmt.Printf("\n\n%s\n", err.Error())
+			}
 		case 4:
 			if err = r.processCatalogActions(); err != nil {
 				fmt.Printf("\n\n%s\n", err.Error())

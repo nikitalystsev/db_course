@@ -19,12 +19,14 @@ const productMenu = `Меню обработки товара:
 	4 -- Посмотреть сертификаты соответствия на товар
 	0 -- Вернуться в главное меню
 `
+const certificateKey = "certificates"
 
 func (r *Requester) processProductActions(productID uuid.UUID, num int) error {
 	var (
 		menuItem int
 		err      error
 	)
+	r.cache.Set(certificateKey, make([]uuid.UUID, 0))
 
 	if err = r.viewProduct(productID, num); err != nil {
 		return err
@@ -125,6 +127,11 @@ func (r *Requester) comparePriceOnProduct(productID uuid.UUID, num int) error {
 }
 
 func (r *Requester) viewCertificatesCompliance(productID uuid.UUID, num int) error {
+	var certificateIDs []uuid.UUID
+	if err := r.cache.Get(certificateKey, &certificateIDs); err != nil {
+		return err
+	}
+
 	request := HTTPRequest{
 		Method: http.MethodGet,
 		URL:    r.baseURL + "/certificates",
@@ -156,6 +163,8 @@ func (r *Requester) viewCertificatesCompliance(productID uuid.UUID, num int) err
 	}
 
 	printCertificates(certificates, num)
+	copyCertificateIDsToArray(&certificateIDs, certificates)
+	r.cache.Set(certificateKey, certificateIDs)
 
 	return nil
 }
@@ -260,4 +269,10 @@ func printCertificates(certificates []*models.CertificateModel, num int) {
 	}
 
 	fmt.Println(t.Render())
+}
+
+func copyCertificateIDsToArray(certificateIDs *[]uuid.UUID, certificates []*models.CertificateModel) {
+	for _, certificate := range certificates {
+		*certificateIDs = append(*certificateIDs, certificate.ID)
+	}
 }

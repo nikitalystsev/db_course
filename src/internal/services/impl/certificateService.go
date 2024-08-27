@@ -18,6 +18,15 @@ func NewCertificateService(certificateRepo intfRepo.ICertificateRepo) intf.ICert
 	return &CertificateService{certificateRepo: certificateRepo}
 }
 
+func (cs *CertificateService) Create(ctx context.Context, certificate *models.CertificateModel) error {
+	err := cs.certificateRepo.Create(ctx, certificate)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (cs *CertificateService) GetByProductID(ctx context.Context, productID uuid.UUID) ([]*models.CertificateModel, error) {
 	certificates, err := cs.certificateRepo.GetByProductID(ctx, productID)
 	if err != nil && errors.Is(err, errs.ErrCertificateDoesNotExists) {
@@ -29,4 +38,13 @@ func (cs *CertificateService) GetByProductID(ctx context.Context, productID uuid
 	}
 
 	return certificates, nil
+}
+
+func (cs *CertificateService) DeleteByID(ctx context.Context, ID uuid.UUID) error {
+	err := cs.certificateRepo.DeleteByID(ctx, ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
