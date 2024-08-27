@@ -14,6 +14,11 @@ grant insert on table ss.sale_product to registered;
 grant insert on table ss.rating to registered;
 grant insert on table ss.shop to registered;
 grant insert on table ss.product to registered;
+grant insert on table ss.retailer to registered;
+grant insert on table ss.distributor to registered;
+grant insert on table ss.manufacturer to registered;
+grant insert on table ss.retailer_distributor to registered;
+grant insert on table ss.distributor_manufacturer to registered;
 
 grant update on table ss.sale_product to registered;
 

@@ -15,6 +15,12 @@ revoke insert on table ss.sale_product from registered;
 revoke insert on table ss.rating from registered;
 revoke insert on table ss.shop from registered;
 revoke insert on table ss.product from registered;
+revoke insert on table ss.retailer from registered;
+revoke insert on table ss.distributor from registered;
+revoke insert on table ss.manufacturer from registered;
+revoke insert on table ss.retailer_distributor from registered;
+revoke insert on table ss.distributor_manufacturer from registered;
+
 revoke guest from registered;
 
 revoke insert on table ss."user" from guest;
