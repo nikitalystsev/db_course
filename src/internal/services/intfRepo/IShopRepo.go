@@ -12,5 +12,5 @@ type IShopRepo interface {
 	DeleteByID(ctx context.Context, ID uuid.UUID) error
 	GetByID(ctx context.Context, ID uuid.UUID) (*models.ShopModel, error)
 	GetByAddress(ctx context.Context, shopAddress string) (*models.ShopModel, error)
-	GetByParams(ctx context.Context, params *dto.ShopDTO) ([]*models.ShopModel, error)
+	GetByParams(ctx context.Context, params *dto.ShopParamsDTO) ([]*models.ShopModel, error)
 }

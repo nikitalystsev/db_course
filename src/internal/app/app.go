@@ -88,7 +88,7 @@ func Run(configDir string) {
 	ratingService := implServices.NewRatingService(ratingRepo)
 	supplierService := implServices.NewSupplierService(supplierRepo)
 	promotionService := implServices.NewPromotionService(promotionRepo)
-	shopService := implServices.NewShopService(shopRepo)
+	shopService := implServices.NewShopService(shopRepo, supplierRepo, transactionManager)
 	certificateService := implServices.NewCertificateService(certificateRepo)
 	saleProductService := implServices.NewSaleProductService(
 		saleProductRepo,

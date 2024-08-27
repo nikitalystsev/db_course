@@ -14,12 +14,11 @@ import (
 )
 
 func (h *Handler) getShops(c *gin.Context) {
-	var shopDTO dto.ShopDTO
-	shopDTO.RetailerID = uuid.Nil
-	shopDTO.Title = c.Query("title")
-	shopDTO.Address = c.Query("address")
-	shopDTO.PhoneNumber = c.Query("phone_number")
-	shopDTO.FioDirector = c.Query("fio_director")
+	var shopParamsDTO dto.ShopParamsDTO
+	shopParamsDTO.Title = c.Query("title")
+	shopParamsDTO.Address = c.Query("address")
+	shopParamsDTO.PhoneNumber = c.Query("phone_number")
+	shopParamsDTO.FioDirector = c.Query("fio_director")
 	limit := c.Query("limit")
 	offset := c.Query("offset")
 
@@ -28,19 +27,19 @@ func (h *Handler) getShops(c *gin.Context) {
 		return
 	}
 	var err error
-	shopDTO.Limit, err = strconv.Atoi(limit)
+	shopParamsDTO.Limit, err = strconv.Atoi(limit)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, "invalid limit")
 		return
 	}
-	shopDTO.Offset, err = strconv.Atoi(offset)
+	shopParamsDTO.Offset, err = strconv.Atoi(offset)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, "invalid offset")
 		return
 	}
 
 	var shops []*models.ShopModel
-	shops, err = h.shopService.GetByParams(c.Request.Context(), &shopDTO)
+	shops, err = h.shopService.GetByParams(c.Request.Context(), &shopParamsDTO)
 	if err != nil && errors.Is(err, errs.ErrShopDoesNotExists) {
 		c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
 		return

@@ -34,7 +34,7 @@ func (r *Requester) processShopActions() error {
 		menuItem int
 		err      error
 	)
-	r.cache.Set(shopParamsKey, dto.ShopDTO{Limit: pageLimit, Offset: 0})
+	r.cache.Set(shopParamsKey, dto.ShopParamsDTO{Limit: pageLimit, Offset: 0})
 	r.cache.Set(shopsKey, make([]uuid.UUID, 0))
 
 	for {
@@ -76,7 +76,7 @@ func (r *Requester) processShopActions() error {
 }
 
 func (r *Requester) viewFirstPageShops() error {
-	var shopParams dto.ShopDTO
+	var shopParams dto.ShopParamsDTO
 	var shopPagesID []uuid.UUID
 
 	var tokens dto.UserTokensDTO
@@ -138,7 +138,7 @@ func (r *Requester) viewFirstPageShops() error {
 	r.cache.Set(shopsKey, shopPagesID)
 	r.cache.Set(
 		shopParamsKey,
-		dto.ShopDTO{
+		dto.ShopParamsDTO{
 			Limit:  pageLimit,
 			Offset: shopParams.Offset + pageLimit,
 		},
@@ -148,7 +148,7 @@ func (r *Requester) viewFirstPageShops() error {
 }
 
 func (r *Requester) viewNextPage() error {
-	var shopParams dto.ShopDTO
+	var shopParams dto.ShopParamsDTO
 	if err := r.cache.Get(shopParamsKey, &shopParams); err != nil {
 		return err
 	}
@@ -204,7 +204,7 @@ func (r *Requester) viewNextPage() error {
 	r.cache.Set(shopsKey, shopPagesID)
 	r.cache.Set(
 		shopParamsKey,
-		dto.ShopDTO{
+		dto.ShopParamsDTO{
 			Limit:  pageLimit,
 			Offset: shopParams.Offset + pageLimit,
 		},

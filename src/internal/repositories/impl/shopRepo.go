@@ -90,7 +90,7 @@ func (sr *ShopRepo) GetByAddress(ctx context.Context, shopAddress string) (*mode
 	return &shop, nil
 }
 
-func (sr *ShopRepo) GetByParams(ctx context.Context, params *dto.ShopDTO) ([]*models.ShopModel, error) {
+func (sr *ShopRepo) GetByParams(ctx context.Context, params *dto.ShopParamsDTO) ([]*models.ShopModel, error) {
 	query := `select id, retailer_id, title, address, phone_number, fio_director 
 			  from ss.shop 
 	          where ($1 = '' or title ilike '%' || $1 || '%') and 

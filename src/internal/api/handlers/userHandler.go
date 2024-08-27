@@ -128,16 +128,7 @@ func (h *Handler) addShop(c *gin.Context) {
 		return
 	}
 
-	shop := &models.ShopModel{
-		ID:          uuid.New(),
-		RetailerID:  shopDTO.RetailerID,
-		Title:       shopDTO.Title,
-		Address:     shopDTO.Address,
-		PhoneNumber: shopDTO.PhoneNumber,
-		FioDirector: shopDTO.FioDirector,
-	}
-
-	err := h.shopService.Create(c.Request.Context(), shop)
+	err := h.shopService.Create(c.Request.Context(), &shopDTO)
 	if err != nil && errors.Is(err, errs.ErrShopAlreadyExist) {
 		c.AbortWithStatusJSON(http.StatusConflict, err.Error())
 		return

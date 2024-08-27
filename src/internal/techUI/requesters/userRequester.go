@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	"net/http"
 	"time"
 )
@@ -69,20 +68,20 @@ func (r *Requester) addNewShop() error {
 		return err
 	}
 
+	var shopDTO dto.ShopDTO
 	fmt.Printf("\n\nДля добавления нового магазина необходимо ввести " +
 		"данные Ритейлера, с которым он сотрудничает\n")
 
-	retailerID, err := r.addNewRetailerIfNotExist(tokens)
+	shopParams, err := input.RetailerParams()
 	if err != nil {
 		return err
 	}
+	shopDTO.Retailer = *shopParams
 
-	shopDTO, err := input.ShopParams()
+	shopDTO.ShopParams, err = input.ShopParams()
 	if err != nil {
 		return err
 	}
-
-	shopDTO.RetailerID = retailerID
 
 	request := HTTPRequest{
 		Method: http.MethodPost,
@@ -111,88 +110,6 @@ func (r *Requester) addNewShop() error {
 	fmt.Printf("\n\nМагазин был успешно добавлен!\n")
 
 	return nil
-}
-
-func (r *Requester) addNewRetailerIfNotExist(tokens dto.UserTokensDTO) (uuid.UUID, error) {
-	retailerDTO, err := input.RetailerParams()
-	if err != nil {
-		return uuid.Nil, err
-	}
-
-	request := HTTPRequest{
-		Method: http.MethodPost,
-		URL:    r.baseURL + "/api/retailers",
-		Headers: map[string]string{
-			"Content-Type":  "application/json",
-			"Authorization": fmt.Sprintf("Bearer %s", tokens.AccessToken),
-		},
-		Body:    retailerDTO,
-		Timeout: 10 * time.Second,
-	}
-
-	response, err := SendRequest(request)
-	if err != nil {
-		return uuid.Nil, err
-	}
-
-	if response.StatusCode == http.StatusConflict {
-		var retailerID uuid.UUID
-		retailerID, err = r.getRetailerByAddress(tokens, retailerDTO.Address)
-		if err != nil {
-			return uuid.Nil, err
-		}
-		return retailerID, nil
-	}
-
-	if response.StatusCode == http.StatusInternalServerError || response.StatusCode == http.StatusBadRequest {
-		var info string
-		if err = json.Unmarshal(response.Body, &info); err != nil {
-			return uuid.Nil, err
-		}
-		return uuid.Nil, errors.New(info)
-	}
-
-	var retailerID uuid.UUID
-	if err = json.Unmarshal(response.Body, &retailerID); err != nil {
-		return uuid.Nil, err
-	}
-
-	return retailerID, nil
-}
-
-func (r *Requester) getRetailerByAddress(tokens dto.UserTokensDTO, address string) (uuid.UUID, error) {
-	request := HTTPRequest{
-		Method: http.MethodGet,
-		URL:    r.baseURL + "/api/retailers",
-		Headers: map[string]string{
-			"Content-Type":  "application/json",
-			"Authorization": fmt.Sprintf("Bearer %s", tokens.AccessToken),
-		},
-		QueryParams: map[string]string{
-			"address": address,
-		},
-		Timeout: 10 * time.Second,
-	}
-
-	response, err := SendRequest(request)
-	if err != nil {
-		return uuid.Nil, err
-	}
-
-	if response.StatusCode != http.StatusOK {
-		var info string
-		if err = json.Unmarshal(response.Body, &info); err != nil {
-			return uuid.Nil, err
-		}
-		return uuid.Nil, errors.New(info)
-	}
-
-	var retailerID uuid.UUID
-	if err = json.Unmarshal(response.Body, &retailerID); err != nil {
-		return uuid.Nil, err
-	}
-
-	return retailerID, nil
 }
 
 func (r *Requester) signIn(stopRefresh <-chan struct{}) error {

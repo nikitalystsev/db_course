@@ -8,8 +8,8 @@ import (
 )
 
 type IShopService interface {
-	Create(ctx context.Context, shop *models.ShopModel) error
+	Create(ctx context.Context, shopDTO *dto.ShopDTO) error
 	GetByID(ctx context.Context, ID uuid.UUID) (*models.ShopModel, error)
 	DeleteByID(ctx context.Context, ID uuid.UUID) error
-	GetByParams(ctx context.Context, params *dto.ShopDTO) ([]*models.ShopModel, error)
+	GetByParams(ctx context.Context, params *dto.ShopParamsDTO) ([]*models.ShopModel, error)
 }

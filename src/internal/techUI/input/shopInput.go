@@ -4,7 +4,6 @@ import (
 	"SmartShopper-services/core/dto"
 	"bufio"
 	"fmt"
-	"github.com/google/uuid"
 	"os"
 	"strconv"
 	"strings"
@@ -88,25 +87,24 @@ func ShopFioDirector() (string, error) {
 	return rarity, nil
 }
 
-func ShopParams() (dto.ShopDTO, error) {
+func ShopParams() (dto.ShopParamsDTO, error) {
 	var (
-		shop dto.ShopDTO
+		shop dto.ShopParamsDTO
 		err  error
 	)
 
 	if shop.Title, err = ShopTitle(); err != nil {
-		return dto.ShopDTO{}, err
+		return dto.ShopParamsDTO{}, err
 	}
 	if shop.Address, err = ShopAddress(); err != nil {
-		return dto.ShopDTO{}, err
+		return dto.ShopParamsDTO{}, err
 	}
 	if shop.PhoneNumber, err = ShopPhoneNumber(); err != nil {
-		return dto.ShopDTO{}, err
+		return dto.ShopParamsDTO{}, err
 	}
 	if shop.FioDirector, err = ShopFioDirector(); err != nil {
-		return dto.ShopDTO{}, err
+		return dto.ShopParamsDTO{}, err
 	}
-	shop.RetailerID = uuid.Nil
 
 	return shop, nil
 }
