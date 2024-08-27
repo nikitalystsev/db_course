@@ -50,7 +50,7 @@ func (sps *SaleProductService) Create(ctx context.Context, saleProduct *dto.NewS
 	fmt.Println("call Create")
 	return sps.transactionManager.Do(ctx, func(ctx context.Context) error {
 		fmt.Println("call inner func")
-		supplierIDs, err := sps.addSuppliersIfNotExists(ctx, saleProduct.Suppliers)
+		supplierIDs, err := sps.addSuppliersIfNotExists(ctx, saleProduct.ShopID, saleProduct.Suppliers)
 		if err != nil {
 			return err
 		}
@@ -134,27 +134,27 @@ func (sps *SaleProductService) Update(ctx context.Context, saleProduct *models.S
 	return nil
 }
 
-func (sps *SaleProductService) addSuppliersIfNotExists(ctx context.Context, suppliers [3]*dto.SupplierDTO) (SupplierIDs, error) {
+func (sps *SaleProductService) addSuppliersIfNotExists(ctx context.Context, shopID uuid.UUID, suppliers [2]*dto.SupplierDTO) (SupplierIDs, error) {
 	fmt.Println("call addSuppliersIfNotExists")
 
 	var (
 		supplierIDs SupplierIDs
 		err         error
 	)
-	supplierIDs.retailerID, err = sps.addRetailerIfNotExists(ctx, suppliers[0])
+	supplierIDs.retailerID, err = sps.getRetailerByShopID(ctx, shopID)
 	if err != nil {
 		return SupplierIDs{}, err
 	}
 
 	fmt.Println("Добавили ритейлера")
 
-	supplierIDs.distributorID, err = sps.addDistributorIfNotExists(ctx, suppliers[1])
+	supplierIDs.distributorID, err = sps.addDistributorIfNotExists(ctx, suppliers[0])
 	if err != nil {
 		return SupplierIDs{}, err
 	}
 	fmt.Println("Добавили 2")
 
-	supplierIDs.manufacturerID, err = sps.addManufacturerIfNotExists(ctx, suppliers[2])
+	supplierIDs.manufacturerID, err = sps.addManufacturerIfNotExists(ctx, suppliers[1])
 	if err != nil {
 		return SupplierIDs{}, err
 	}
@@ -174,29 +174,17 @@ func (sps *SaleProductService) addSuppliersIfNotExists(ctx context.Context, supp
 	return supplierIDs, nil
 }
 
-func (sps *SaleProductService) addRetailerIfNotExists(ctx context.Context, retailerDTO *dto.SupplierDTO) (uuid.UUID, error) {
-	existingRetailer, err := sps.supplierRepo.GetRetailerByAddress(ctx, retailerDTO.Address)
-	if err != nil && !errors.Is(err, errs.ErrRetailerDoesNotExists) {
+func (sps *SaleProductService) getRetailerByShopID(ctx context.Context, shopID uuid.UUID) (uuid.UUID, error) {
+	existingShop, err := sps.shopRepo.GetByID(ctx, shopID)
+	if err != nil && !errors.Is(err, errs.ErrShopDoesNotExists) {
 		return uuid.Nil, err
 	}
 
-	if existingRetailer != nil {
-		return existingRetailer.ID, nil
+	if existingShop == nil {
+		return uuid.Nil, errs.ErrShopDoesNotExists
 	}
 
-	retailer := &models.SupplierModel{
-		ID:                uuid.New(),
-		Title:             retailerDTO.Title,
-		Address:           retailerDTO.Address,
-		PhoneNumber:       retailerDTO.PhoneNumber,
-		FioRepresentative: retailerDTO.FioRepresentative,
-	}
-
-	if err = sps.supplierRepo.CreateRetailer(ctx, retailer); err != nil {
-		return uuid.Nil, err
-	}
-
-	return retailer.ID, nil
+	return existingShop.RetailerID, nil
 }
 
 func (sps *SaleProductService) addDistributorIfNotExists(ctx context.Context, distributorDTO *dto.SupplierDTO) (uuid.UUID, error) {

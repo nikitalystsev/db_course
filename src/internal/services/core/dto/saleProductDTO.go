@@ -39,6 +39,6 @@ type NewSaleProductDTO struct {
 	ShopID    uuid.UUID
 	Promotion PromotionDTO
 	Product   ProductDTO
-	Suppliers [3]*SupplierDTO
+	Suppliers [2]*SupplierDTO
 	Price     PriceDTO
 }

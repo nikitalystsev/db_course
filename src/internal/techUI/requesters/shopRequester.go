@@ -409,18 +409,10 @@ func (r *Requester) adNewProductInShop() error {
 	var newSaleProductDTO dto.NewSaleProductDTO
 	newSaleProductDTO.ShopID = shopPagesID[num]
 
-	fmt.Printf("\n\nДля добавления нового товара необходимо ввести " +
-		"данные Ритейлера, который его реализует\n")
-
-	newSaleProductDTO.Suppliers[0], err = input.RetailerParams()
-	if err != nil {
-		return err
-	}
-
 	fmt.Printf("\nДля добавления нового товара необходимо ввести " +
 		"данные Дистрибьютора, который его распространяет\n")
 
-	newSaleProductDTO.Suppliers[1], err = input.DistributorParams()
+	newSaleProductDTO.Suppliers[0], err = input.DistributorParams()
 	if err != nil {
 		return err
 	}
@@ -428,7 +420,7 @@ func (r *Requester) adNewProductInShop() error {
 	fmt.Printf("\nДля добавления нового товара необходимо ввести " +
 		"данные Производителя, который его производит\n")
 
-	newSaleProductDTO.Suppliers[2], err = input.ManufacturerParams()
+	newSaleProductDTO.Suppliers[1], err = input.ManufacturerParams()
 	if err != nil {
 		return err
 	}
