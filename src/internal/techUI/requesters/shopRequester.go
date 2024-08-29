@@ -304,6 +304,7 @@ func printShopSales(salesDTO []*dto.SaleProductShopDTO, num int) {
 			"Цена",
 			"Валюта",
 			"Средний рейтинг",
+			"Соответствие сертификатам",
 		},
 	)
 
@@ -330,6 +331,7 @@ func printShopSales(salesDTO []*dto.SaleProductShopDTO, num int) {
 				saleProduct.Price,
 				saleProduct.Currency,
 				avgRating,
+				saleProduct.CertificatesStatistic,
 			},
 		)
 	}

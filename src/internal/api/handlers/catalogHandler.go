@@ -4,7 +4,9 @@ import (
 	"SmartShopper-services/core/dto"
 	"SmartShopper-services/core/models"
 	"SmartShopper-services/errs"
+	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
@@ -59,17 +61,24 @@ func (h *Handler) getProductByID(c *gin.Context) {
 		return
 	}
 
+	stat, err := h.getCertificateStatisticsByProductID(product.ID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
 	productDTO := &dto.ProductDTO{
-		Retailer:     retailer.Title,
-		Distributor:  distributor.Title,
-		Manufacturer: manufacturer.Title,
-		Name:         product.Name,
-		Categories:   product.Categories,
-		Brand:        product.Brand,
-		Compound:     product.Compound,
-		GrossMass:    product.GrossMass,
-		NetMass:      product.NetMass,
-		PackageType:  product.PackageType,
+		Retailer:              retailer.Title,
+		Distributor:           distributor.Title,
+		Manufacturer:          manufacturer.Title,
+		Name:                  product.Name,
+		Categories:            product.Categories,
+		Brand:                 product.Brand,
+		Compound:              product.Compound,
+		GrossMass:             product.GrossMass,
+		NetMass:               product.NetMass,
+		PackageType:           product.PackageType,
+		CertificatesStatistic: stat,
 	}
 
 	c.JSON(http.StatusOK, productDTO)
@@ -105,5 +114,69 @@ func (h *Handler) getProducts(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, products)
+	productsCertificates, err := h.addInfoAboutCertificates(products)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, productsCertificates)
+}
+
+func (h *Handler) addInfoAboutCertificates(products []*models.ProductModel) ([]*dto.ProductCertificateDTO, error) {
+	productCertificatesDTO := make([]*dto.ProductCertificateDTO, len(products))
+
+	for i, product := range products {
+		stat, err := h.getCertificateStatisticsByProductID(product.ID)
+		if err != nil {
+			return nil, err
+		}
+		productCertificatesDTO[i] = &dto.ProductCertificateDTO{
+			ID:                    product.ID,
+			RetailerID:            product.RetailerID,
+			DistributorID:         product.DistributorID,
+			ManufacturerID:        product.ManufacturerID,
+			Name:                  product.Name,
+			Categories:            product.Categories,
+			Brand:                 product.Brand,
+			Compound:              product.Compound,
+			GrossMass:             product.GrossMass,
+			NetMass:               product.NetMass,
+			PackageType:           product.PackageType,
+			CertificatesStatistic: stat,
+		}
+	}
+
+	return productCertificatesDTO, nil
+}
+
+func (h *Handler) getCertificateStatisticsByProductID(productID uuid.UUID) (string, error) {
+	certificateStatisticsDTO, err := h.certificateService.GetCertificateStatisticsByProductID(
+		context.Background(),
+		productID,
+	)
+	if err != nil && !errors.Is(err, errs.ErrCertificateDoesNotExists) {
+		return "", err
+	}
+
+	if certificateStatisticsDTO == nil {
+		return "Не сертифицирован", nil
+	}
+
+	if certificateStatisticsDTO.TotalCountCertificates == 0 {
+		return "Не сертифицирован", nil
+	}
+
+	if certificateStatisticsDTO.CountValidCertificates == 0 {
+		return fmt.Sprintf(
+			"Не соответствует ни одному из %d сертификатов",
+			certificateStatisticsDTO.CountValidCertificates,
+		), nil
+	}
+
+	return fmt.Sprintf(
+		"Cоответствует %d/%d сертификатам",
+		certificateStatisticsDTO.CountValidCertificates,
+		certificateStatisticsDTO.TotalCountCertificates,
+	), err
 }

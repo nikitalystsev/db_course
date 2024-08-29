@@ -2,7 +2,6 @@ package requesters
 
 import (
 	"SmartShopper-services/core/dto"
-	"SmartShopper-services/core/models"
 	"SmartShopper/internal/techUI/input"
 	"encoding/json"
 	"errors"
@@ -99,13 +98,13 @@ func (r *Requester) viewPage() error {
 		return errors.New(info)
 	}
 
-	var products []*models.ProductModel
-	if err = json.Unmarshal(response.Body, &products); err != nil {
+	var productsCertificates []*dto.ProductCertificateDTO
+	if err = json.Unmarshal(response.Body, &productsCertificates); err != nil {
 		return err
 	}
 
-	printProducts(products, productParams.Offset)
-	copyProductIDsToArray(&productPagesID, products)
+	printProducts(productsCertificates, productParams.Offset)
+	copyProductIDsToArray(&productPagesID, productsCertificates)
 	r.cache.Set(productsKey, productPagesID)
 	r.cache.Set(
 		productParamsKey,
@@ -143,21 +142,21 @@ func (r *Requester) processProduct() error {
 	return nil
 }
 
-func printProducts(products []*models.ProductModel, offset int) {
+func printProducts(products []*dto.ProductCertificateDTO, offset int) {
 	t := table.NewWriter()
 	t.SetTitle(fmt.Sprintf("Страница товаров №%d", offset/pageLimit+1))
 	t.SetStyle(table.StyleBold)
 	t.Style().Format.Header = text.FormatTitle
-	t.AppendHeader(table.Row{"No.", "Название товара", "Категория"})
+	t.AppendHeader(table.Row{"No.", "Название товара", "Категория", "Соответствие сертификатам"})
 
 	for i, product := range products {
-		t.AppendRow(table.Row{offset + i, product.Name, product.Categories})
+		t.AppendRow(table.Row{offset + i, product.Name, product.Categories, product.CertificatesStatistic})
 	}
 	fmt.Println(t.Render())
 }
 
-func copyProductIDsToArray(productIDs *[]uuid.UUID, products []*models.ProductModel) {
-	for _, product := range products {
-		*productIDs = append(*productIDs, product.ID)
+func copyProductIDsToArray(productIDs *[]uuid.UUID, productsCertificates []*dto.ProductCertificateDTO) {
+	for _, productCertificate := range productsCertificates {
+		*productIDs = append(*productIDs, productCertificate.ID)
 	}
 }

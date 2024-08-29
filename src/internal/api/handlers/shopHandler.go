@@ -139,6 +139,10 @@ func (h *Handler) copySaleToShopDTO(sale *models.SaleProductModel) (*dto.SalePro
 	saleProduct.Currency = sale.Currency
 	saleProduct.SettingDate = sale.SettingDate
 	saleProduct.AvgRating = sale.AvgRating
-
+	saleProduct.CertificatesStatistic, err = h.getCertificateStatisticsByProductID(product.ID)
+	if err != nil {
+		return nil, err
+	}
+	
 	return &saleProduct, nil
 }

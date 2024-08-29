@@ -15,6 +15,7 @@ type SaleProductDTO struct {
 	Currency              string    `json:"currency"`
 	SettingDate           time.Time `json:"setting_date"`
 	AvgRating             *float32  `json:"avg_rating"`
+	CertificatesStatistic string    `json:"certificates_statistic"`
 }
 
 type SaleProductShopDTO struct {
@@ -27,6 +28,7 @@ type SaleProductShopDTO struct {
 	Currency              string    `json:"currency" db:"currency"`
 	SettingDate           time.Time `json:"setting_date" db:"setting_date"`
 	AvgRating             *float32  `json:"avg_rating" db:"avg_rating"`
+	CertificatesStatistic string    `json:"certificates_statistic"`
 }
 
 type PriceDTO struct {

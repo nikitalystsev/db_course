@@ -185,6 +185,7 @@ func printProduct(product *dto.ProductDTO, num int) {
 	t.AppendRow(table.Row{"Масса брутто", product.GrossMass})
 	t.AppendRow(table.Row{"Масса нетто", product.NetMass})
 	t.AppendRow(table.Row{"Тип упаковки", product.PackageType})
+	t.AppendFooter(table.Row{"", product.CertificatesStatistic})
 
 	fmt.Println(t.Render())
 }
@@ -262,8 +263,8 @@ func printCertificates(certificates []*models.CertificateModel, num int) {
 				certificate.Type,
 				certificate.Number,
 				statusCompliance,
-				certificate.RegistrationDate,
-				certificate.ExpirationDate,
+				certificate.RegistrationDate.Format("2006-01-02"),
+				certificate.ExpirationDate.Format("2006-01-02"),
 			},
 		)
 	}
