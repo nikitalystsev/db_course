@@ -24,6 +24,7 @@
 \begin{enumerate}
 	\item \textbf{User} -- представляет пользователя системы. Содержит следующие поля: 
 	\begin{itemize}
+		\item id -- уникальный идентификатор пользователя;
 		\item fio -- ФИО пользователя;
 		\item phone\_number -- номер телефона пользователя;
 		\item password -- поле, хранящее хешированный пароль аккаунта пользователя.
@@ -32,6 +33,7 @@
 	
 	\item \textbf{Shop} -- представляет объект магазина. Содержит следующие поля: 
 	\begin{itemize}
+		\item id -- уникальный идентификатор магазина;
 		\item retailer\_id -- идентификатор ритейлера, с которым работает сотрудничает магазин;
 		\item title -- название магазина;
 		\item address -- адрес магазина;
@@ -41,6 +43,7 @@
 	
 	\item \textbf{Product} -- представляет объект товара. Содержит следующие поля: 
 	\begin{itemize}
+		\item id -- уникальный идентификатор магазина;
 		\item retailer\_id -- идентификатор ритейлера, который реализует товар;
 		\item distributor\_id -- идентификатор дистрибьютора, который распространяет товар;
 		\item manufacturer\_id -- идентификатор производителя, который производит товар;
@@ -55,6 +58,7 @@
 	
 	\item \textbf{Certificate\_compliance} -- представляет объект сертификата соответствия. Содержит следующие поля: 
 	\begin{itemize}
+		\item id -- уникальный идентификатор сертификата;
 		\item product\_id -- идентификатор товара, который соответствует данному сертификату;
 		\item type -- тип сертификата;
 		\item number -- номер сертификата;
@@ -66,6 +70,7 @@
 	
 	\item \textbf{Promotion} -- представляет объект акции на товар. Содержит следующие поля: 
 	\begin{itemize}
+		\item id -- уникальный идентификатор акции;
 		\item type -- тип акции;
 		\item description -- описание акции;
 		\item discount\_size -- размер скидки в процентах;
@@ -75,6 +80,7 @@
 	
 	\item \textbf{Rating} -- представляет объект оценки товара. Содержит следующие поля: 
 	\begin{itemize}
+		\item id -- уникальный идентификатор оценки;
 		\item user\_id -- идентификатор пользователя, оставившего отзыв;
 		\item  sale\_product\_id -- идентификатор продажи конкретного товара в конкретном магазине;
 		\item review -- отзыв;
@@ -83,6 +89,7 @@
 	
 	\item \textbf{Manufacturer} -- представляет объект производителя товара. Содержит следующие поля: 
 	\begin{itemize}
+		\item id -- уникальный идентификатор производителя;
 		\item title -- название производителя;
 		\item address -- адрес производителя;
 		\item phone\_number -- номер телефона;
@@ -91,6 +98,7 @@
 	
 	\item \textbf{Distributor} -- представляет объект дистрибьютора товара. Содержит следующие поля: 
 	\begin{itemize}
+		\item id -- уникальный идентификатор дистрибьютора;
 		\item title -- название дистрибьютора;
 		\item address -- адрес дистрибьютора;
 		\item phone\_number -- номер телефона;
@@ -99,6 +107,7 @@
 	
 	\item \textbf{Retailer} -- представляет объект ритейлера товара. Содержит следующие поля: 
 	\begin{itemize}
+		\item id -- уникальный идентификатор ритейлера;
 		\item title -- название ритейлера;
 		\item address -- адрес ритейлера;
 		\item phone\_number -- номер телефона;
@@ -107,6 +116,7 @@
 	
 	\item \textbf{SaleProduct} -- представляет объект продажи товара. Содержит следующие поля: 
 	\begin{itemize}
+		\item id -- уникальный идентификатор продажи;
 		\item shop\_id -- идентификатор магазина, продающего товар;
 		\item product\_id -- идентификатор продаваемого товара;
 		\item promotion\_id -- идентификатор применяемой к товару акции (если она есть);
@@ -116,13 +126,26 @@
 		\item avg\_rating -- средний рейтинг товара в магазине.
 	\end{itemize}
 	
+	\item \textbf{ReatailerDistributor} -- реализует связь <<многие-ко-многим>> для отношений Reatailer и Distributor. Содержит следующие поля: 
+	\begin{itemize}
+		\item retailer\_id -- идентификатор ритейлера;
+		\item distributor\_id -- идентификатор дистрибьютора.
+	\end{itemize}
+	
+	\item \textbf{DistributorManufacturer} -- реализует связь <<многие-ко-многим>> для отношений Distributor и Manufacturer. Содержит следующие поля: 
+	\begin{itemize}
+		\item distributor\_id -- идентификатор дистрибьютора.
+		\item manufacturer\_id -- идентификатор производителя.
+	\end{itemize}
 \end{enumerate}
 
 \subsection{Ограничения целостности}
 
-В таблицах \ref{tbl:entity_user} -- ... приведены ограничения целостности для каждой основной таблицы разрабатываемой БД.
+В таблицах \ref{tbl:entity_user} -- ... приведены ограничения целостности для каждой таблицы разрабатываемой БД.
  
-\begin{table}[ht]
+\clearpage 
+
+\begin{table}[!h]
 	\begin{center}
 		\begin{threeparttable}
 			\caption{Ограничения целостности таблицы User}
@@ -130,6 +153,8 @@
 			\begin{tabular}{|p{4.5cm}|p{2.5cm}|p{8.5cm}|}
 				\hline 
 				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				id & UUID & Не должно быть пустым. Является первичным ключом записи  \\
 				\hline
 				fio & строка & Не должно быть пустым  \\
 				\hline
@@ -144,7 +169,7 @@
 	\end{center}
 \end{table}
 
-\begin{table}[ht]
+\begin{table}[!h]
 	\begin{center}
 		\begin{threeparttable}
 			\caption{Ограничения целостности таблицы Shop}
@@ -152,6 +177,8 @@
 			\begin{tabular}{|p{4.5cm}|p{2.5cm}|p{8.5cm}|}
 				\hline 
 				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				id & UUID & Не должно быть пустым. Является первичным ключом записи  \\
 				\hline
 				retailer\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Retailer   \\
 				\hline
@@ -167,7 +194,7 @@
 		\end{threeparttable}			
 	\end{center}
 \end{table}
-L
+
 
 \begin{table}[!h]
 	\begin{center}
@@ -177,6 +204,8 @@ L
 			\begin{tabular}{|p{4.5cm}|p{2.5cm}|p{8.5cm}|}
 				\hline 
 				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				id & UUID & Не должно быть пустым. Является первичным ключом записи  \\
 				\hline
 				user\_id & UUID & Не должно быть пустым. Внешний ключ на запись в User  \\
 				\hline
@@ -191,7 +220,9 @@ L
 	\end{center}
 \end{table}
 
-\begin{table}[ht]
+\clearpage
+
+\begin{table}[!h]
 	\begin{center}
 		\begin{threeparttable}
 			\caption{Ограничения целостности таблицы Promotion}
@@ -199,6 +230,8 @@ L
 			\begin{tabular}{|p{4.5cm}|p{2.5cm}|p{8.5cm}|}
 				\hline 
 				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				id & UUID & Не должно быть пустым. Является первичным ключом записи  \\
 				\hline
 				type & строка & Не должно быть пустым  \\
 				\hline
@@ -215,7 +248,7 @@ L
 	\end{center}
 \end{table}
 
-В таблице Promotion для полей start\_date и end\_date также определено следующее ограничение: $ end\_date < end\_date $.
+В таблице Promotion для полей start\_date и end\_date также определено следующее ограничение: $ start\_date < end\_date $.
 
 \begin{table}[!h]
 	\begin{center}
@@ -225,6 +258,8 @@ L
 			\begin{tabular}{|p{4.5cm}|p{2.5cm}|p{8.5cm}|}
 				\hline 
 				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				id & UUID & Не должно быть пустым. Является первичным ключом записи  \\
 				\hline
 				product\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Product  \\
 				\hline
@@ -247,6 +282,7 @@ L
 
 В таблице Certificate\_compliance для полей registration\_data и expiration\_date также определено следующее ограничение: $ registration\_data < expiration\_date $.
 
+\clearpage
 
 Для таблиц Retailer, Distributor, Manufacturer определены следующие ограничения полей: 
 
@@ -258,6 +294,8 @@ L
 			\begin{tabular}{|p{4.5cm}|p{2.5cm}|p{8.5cm}|}
 				\hline 
 				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				id & UUID & Не должно быть пустым. Является первичным ключом записи  \\
 				\hline
 				title & строка & Не должно быть пустым   \\
 				\hline
@@ -272,7 +310,7 @@ L
 	\end{center}
 \end{table}
 
-\begin{table}[ht]
+\begin{table}[!h]
 	\begin{center}
 		\begin{threeparttable}
 			\caption{Ограничения целостности таблицы Product}
@@ -280,6 +318,8 @@ L
 			\begin{tabular}{|p{4.5cm}|p{2.5cm}|p{8.5cm}|}
 				\hline 
 				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				id & UUID & Не должно быть пустым. Является первичным ключом записи  \\
 				\hline
 				retailer\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Retailer  \\
 				\hline
@@ -308,7 +348,6 @@ L
 
 В таблице Product для полей gross\_mass и net\_mass также определено следующее ограничение: $ gross\_mass \geq net\_mass $.
 
-\clearpage
 \begin{table}[!h]
 	\begin{center}
 		\begin{threeparttable}
@@ -317,6 +356,8 @@ L
 			\begin{tabular}{|p{4.5cm}|p{2.5cm}|p{8.5cm}|}
 				\hline 
 				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				id & UUID & Не должно быть пустым. Является первичным ключом записи  \\
 				\hline
 				shop\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Shop  \\
 				\hline
@@ -336,6 +377,49 @@ L
 		\end{threeparttable}			
 	\end{center}
 \end{table}
+
+\begin{table}[!h]
+	\begin{center}
+		\begin{threeparttable}
+			\caption{Ограничения целостности таблицы RetailerDistributor}
+			\label{tbl:entity_retailer_distributor}
+			\begin{tabular}{|p{4.5cm}|p{2.5cm}|p{8.5cm}|}
+				\hline 
+				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				retailer\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Retailer  \\
+				\hline
+				distributor\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Distributor \\
+				\hline
+			\end{tabular}
+		\end{threeparttable}			
+	\end{center}
+\end{table}
+
+В таблице RetailerDistributor также определено следующее ограничение: в совокупности поля retailer\_id и distributor\_id определяют первичный ключ записи.
+
+
+\begin{table}[!h]
+	\begin{center}
+		\begin{threeparttable}
+			\caption{Ограничения целостности таблицы DistributorManufacturer}
+			\label{tbl:entity_distributor_manufacturer}
+			\begin{tabular}{|p{4.5cm}|p{2.5cm}|p{8.5cm}|}
+				\hline 
+				\textbf{Поле} & \textbf{Тип} & \textbf{Ограничение}  \\
+				\hline
+				distributor\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Distributor \\
+				\hline
+				manufacturer\_id & UUID & Не должно быть пустым. Внешний ключ на запись в таблице Manufacturer  \\
+				\hline
+			\end{tabular}
+		\end{threeparttable}			
+	\end{center}
+\end{table}
+
+\clearpage 
+
+В таблице DistributorManufacturer также определено следующее ограничение: в совокупности поля distributor\_id и manufacturer\_id определяют первичный ключ записи.
 
 \subsection{Триггеры базы данных}
 
