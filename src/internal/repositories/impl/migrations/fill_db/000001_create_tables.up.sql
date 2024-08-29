@@ -2,7 +2,7 @@ create extension if not exists "uuid-ossp";
 
 create table if not exists ss.retailer
 (
-    id                 uuid primary key default uuid_generate_v4(),
+    id                 uuid primary key,
     title              text,
     address            text,
     phone_number       varchar(30),
@@ -11,7 +11,7 @@ create table if not exists ss.retailer
 
 create table if not exists ss.distributor
 (
-    id                 uuid primary key default uuid_generate_v4(),
+    id                 uuid primary key,
     title              text,
     address            text,
     phone_number       varchar(30),
@@ -20,7 +20,7 @@ create table if not exists ss.distributor
 
 create table if not exists ss.manufacturer
 (
-    id                 uuid primary key default uuid_generate_v4(),
+    id                 uuid primary key,
     title              text,
     address            text,
     phone_number       varchar(30),
@@ -30,18 +30,17 @@ create table if not exists ss.manufacturer
 
 create table if not exists ss.shop
 (
-    id           uuid primary key default uuid_generate_v4(),
+    id           uuid primary key,
     retailer_id  uuid,
     title        text,
     address      text,
     phone_number varchar(30),
-    fio_director text,
-    foreign key (retailer_id) references retailer (id) on delete cascade on update cascade
+    fio_director text
 );
 
 create table if not exists ss.product
 (
-    id              uuid primary key default uuid_generate_v4(),
+    id              uuid primary key,
     retailer_id     uuid,
     distributor_id  uuid,
     manufacturer_id uuid,
@@ -51,28 +50,24 @@ create table if not exists ss.product
     compound        text,
     gross_mass      numeric,
     net_mass        numeric,
-    package_type    text,
-    foreign key (retailer_id) references retailer (id) on delete cascade on update cascade,
-    foreign key (distributor_id) references distributor (id) on delete cascade on update cascade,
-    foreign key (manufacturer_id) references manufacturer (id) on delete cascade on update cascade
+    package_type    text
 );
 
 create table if not exists ss.certificate_compliance
 (
-    id                 uuid primary key default uuid_generate_v4(),
+    id                 uuid primary key,
     product_id         uuid,
     type               text,
     number             text,
     normative_document text,
     status_compliance  boolean,
     registration_date  date,
-    expiration_date    date,
-    foreign key (product_id) references product (id) on delete cascade on update cascade
+    expiration_date    date
 );
 
 create table if not exists ss.user
 (
-    id                uuid primary key default uuid_generate_v4(),
+    id                uuid primary key,
     fio               text,
     phone_number      varchar(30),
     password          text,
@@ -81,7 +76,7 @@ create table if not exists ss.user
 
 create table if not exists ss.promotion
 (
-    id            uuid primary key default uuid_generate_v4(),
+    id            uuid primary key,
     type          text,
     description   text,
     discount_size numeric,
@@ -91,44 +86,35 @@ create table if not exists ss.promotion
 
 create table if not exists ss.sale_product
 (
-    id           uuid primary key default uuid_generate_v4(),
+    id           uuid primary key,
     shop_id      uuid,
     product_id   uuid,
     promotion_id uuid,
     price        numeric,
     currency     text,
     setting_date date,
-    avg_rating   float,
-    foreign key (shop_id) references shop (id) on delete cascade on update cascade,
-    foreign key (product_id) references product (id) on delete cascade on update cascade,
-    foreign key (promotion_id) references promotion (id) on delete cascade on update cascade
+    avg_rating   float
 );
 
 create table if not exists ss.rating
 (
-    id              uuid primary key default uuid_generate_v4(),
+    id              uuid primary key,
     user_id         uuid,
     sale_product_id uuid,
     review          text,
-    rating          numeric,
-    foreign key (user_id) references "user" (id) on delete cascade on update cascade,
-    foreign key (sale_product_id) references sale_product (id) on delete cascade on update cascade
+    rating          numeric
 );
 
 create table if not exists ss.retailer_distributor
 (
     retailer_id    uuid,
     distributor_id uuid,
-    primary key (retailer_id, distributor_id),
-    foreign key (retailer_id) references retailer (id) on delete cascade on update cascade,
-    foreign key (distributor_id) references distributor (id) on delete cascade on update cascade
+    primary key (retailer_id, distributor_id)
 );
 
 create table if not exists ss.distributor_manufacturer
 (
     distributor_id  uuid,
     manufacturer_id uuid,
-    primary key (distributor_id, manufacturer_id),
-    foreign key (distributor_id) references distributor (id) on delete cascade on update cascade,
-    foreign key (manufacturer_id) references manufacturer (id) on delete cascade on update cascade
+    primary key (distributor_id, manufacturer_id)
 );

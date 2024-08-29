@@ -1,5 +1,6 @@
 alter table if exists ss.retailer
     alter column id set not null,
+    alter column id set default uuid_generate_v4(),
     alter column title set not null,
     alter column address set not null,
     add unique (address),
@@ -10,6 +11,7 @@ alter table if exists ss.retailer
 
 alter table if exists ss.distributor
     alter column id set not null,
+    alter column id set default uuid_generate_v4(),
     alter column title set not null,
     alter column address set not null,
     add unique (address),
@@ -20,6 +22,7 @@ alter table if exists ss.distributor
 
 alter table if exists ss.manufacturer
     alter column id set not null,
+    alter column id set default uuid_generate_v4(),
     alter column title set not null,
     alter column address set not null,
     add unique (address),
@@ -30,7 +33,9 @@ alter table if exists ss.manufacturer
 
 alter table if exists ss.shop
     alter column id set not null,
+    alter column id set default uuid_generate_v4(),
     alter column retailer_id set not null,
+    add foreign key (retailer_id) references retailer (id) on delete cascade on update cascade,
     alter column title set not null,
     alter column address set not null,
     add unique (address),
@@ -40,9 +45,13 @@ alter table if exists ss.shop
 
 alter table if exists ss.product
     alter column id set not null,
+    alter column id set default uuid_generate_v4(),
     alter column retailer_id set not null,
+    add foreign key (retailer_id) references retailer (id) on delete cascade on update cascade,
     alter column distributor_id set not null,
+    add foreign key (distributor_id) references distributor (id) on delete cascade on update cascade,
     alter column manufacturer_id set not null,
+    add foreign key (manufacturer_id) references manufacturer (id) on delete cascade on update cascade,
     alter column name set not null,
     alter column categories set not null,
     alter column brand set not null,
@@ -55,7 +64,9 @@ alter table if exists ss.product
 
 alter table if exists ss.certificate_compliance
     alter column id set not null,
+    alter column id set default uuid_generate_v4(),
     alter column product_id set not null,
+    add foreign key (product_id) references product (id) on delete cascade on update cascade,
     alter column type set not null,
     alter column number set not null,
     alter column normative_document set not null,
@@ -66,6 +77,7 @@ alter table if exists ss.certificate_compliance
 
 alter table ss.user
     alter column id set not null,
+    alter column id set default uuid_generate_v4(),
     alter column fio set not null,
     alter column phone_number set not null,
     add unique (phone_number),
@@ -74,6 +86,7 @@ alter table ss.user
 
 alter table ss.promotion
     alter column id set not null,
+    alter column id set default uuid_generate_v4(),
     alter column type set not null,
     alter column description set not null,
     alter column start_date set not null,
@@ -83,8 +96,12 @@ alter table ss.promotion
 
 alter table ss.sale_product
     alter column id set not null,
+    alter column id set default uuid_generate_v4(),
     alter column shop_id set not null,
+    add foreign key (shop_id) references shop (id) on delete cascade on update cascade,
     alter column product_id set not null,
+    add foreign key (product_id) references product (id) on delete cascade on update cascade,
+    add foreign key (promotion_id) references promotion (id) on delete cascade on update cascade,
     alter column price set not null,
     alter column currency set not null,
     alter column setting_date set not null,
@@ -94,13 +111,26 @@ alter table ss.sale_product
 
 alter table ss.rating
     alter column id set not null,
+    alter column id set default uuid_generate_v4(),
     alter column user_id set not null,
+    add foreign key (user_id) references "user" (id) on delete cascade on update cascade,
     alter column sale_product_id set not null,
+    add foreign key (sale_product_id) references sale_product (id) on delete cascade on update cascade,
     alter column review set not null,
     alter column rating set not null,
     add check (rating >= 0 and rating <= 5);
 
+alter table ss.retailer_distributor
+    alter column retailer_id set not null,
+    add foreign key (retailer_id) references retailer (id) on delete cascade on update cascade,
+    alter column distributor_id set not null,
+    add foreign key (distributor_id) references distributor (id) on delete cascade on update cascade;
 
+alter table ss.distributor_manufacturer
+    alter column distributor_id set not null,
+    add foreign key (distributor_id) references distributor (id) on delete cascade on update cascade,
+    alter column manufacturer_id set not null,
+    add foreign key (manufacturer_id) references manufacturer (id) on delete cascade on update cascade;
 
 
 
