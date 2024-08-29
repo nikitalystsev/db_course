@@ -26,7 +26,7 @@ end;
 $$
     language plpgsql;
 
-create or replace function ss.update_sale_product_avg_rating()
+create or replace function ss.recount_sale_product_avg_rating()
     returns trigger
 as
 $$
@@ -50,14 +50,8 @@ end;
 $$
     language plpgsql;
 
-create or replace trigger insert_sale_product_avg_rating
-    after insert
+create or replace trigger recount_sale_product_avg_rating
+    after insert or delete
     on ss.rating
     for each row
-execute function ss.update_sale_product_avg_rating();
-
-create or replace trigger delete_sale_product_avg_rating
-    after delete
-    on ss.rating
-    for each row
-execute function ss.update_sale_product_avg_rating();
+execute function ss.recount_sale_product_avg_rating();
