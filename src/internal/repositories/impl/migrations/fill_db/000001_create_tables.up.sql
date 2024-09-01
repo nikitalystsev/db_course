@@ -93,7 +93,7 @@ create table if not exists ss.sale_product
     price        numeric,
     currency     text,
     setting_date date,
-    avg_rating   float
+    avg_rating   numeric
 );
 
 create table if not exists ss.rating

@@ -31,3 +31,5 @@ RUN chmod +x ./test.sh
 
 CMD ["./test.sh"]
 ENTRYPOINT ["./test.sh"]
+
+# https://writeitdifferently.com/postgresql/pgtap/2020/04/08/pgtap-flyway-with-docker.html -- откуда взял идею

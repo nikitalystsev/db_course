@@ -39,12 +39,12 @@ then
   exit 1
 fi
 
-##waiting for postgres
-#while ! curl http://"$HOST":"$PORT"/ 2>&1 | grep "52"
-#do
-##    echo "Waiting for PostgreSQL..."
-#    sleep 1
-#done
+#waiting for postgres
+while ! curl http://"$HOST":"$PORT"/ 2>&1 | grep "52"
+do
+#    echo "Waiting for PostgreSQL..."
+    sleep 1
+done
 
 #echo "Postgres is ready, installing pgTAP"
 PGPASSWORD=$PASSWORD psql -h "$HOST" -p "$PORT" -d "$DATABASE" -U "$USER" -f /usr/local/share/postgresql/extension/pgtap.sql > /dev/null
