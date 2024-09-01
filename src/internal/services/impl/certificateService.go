@@ -72,3 +72,22 @@ func (cs *CertificateService) GetCertificateStatisticsByProductID(ctx context.Co
 
 	return &certificateStatisticsDTO, nil
 }
+
+func (cs *CertificateService) GetByID(ctx context.Context, ID uuid.UUID) (*models.CertificateModel, error) {
+	certificate, err := cs.certificateRepo.GetByID(ctx, ID)
+	if err != nil && errors.Is(err, errs.ErrCertificateDoesNotExists) {
+		return nil, err
+	}
+	if certificate == nil {
+		return nil, errs.ErrCertificateDoesNotExists
+	}
+	return certificate, nil
+}
+
+func (cs *CertificateService) Update(ctx context.Context, certificate *models.CertificateModel) error {
+	err := cs.certificateRepo.Update(ctx, certificate)
+	if err != nil {
+		return err
+	}
+	return nil
+}

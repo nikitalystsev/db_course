@@ -141,6 +141,19 @@ func CertificateParams() (dto.CertificateDTO, error) {
 	return certificateDTO, nil
 }
 
+func CertificateStatusParam() (dto.CertificateStatusDTO, error) {
+	var (
+		certificateStatusDTO dto.CertificateStatusDTO
+		err                  error
+	)
+
+	if certificateStatusDTO.StatusCompliance, err = IsCompliance(); err != nil {
+		return dto.CertificateStatusDTO{}, err
+	}
+
+	return certificateStatusDTO, nil
+}
+
 func CertificateCatalogNumber() (int, error) {
 	reader := bufio.NewReader(os.Stdin)
 

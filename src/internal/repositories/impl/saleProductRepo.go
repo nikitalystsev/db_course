@@ -95,9 +95,25 @@ func (spr *SaleProductRepo) GetByID(ctx context.Context, ID uuid.UUID) (*models.
 }
 
 func (spr *SaleProductRepo) Update(ctx context.Context, saleProduct *models.SaleProductModel) error {
-	query := `update ss.sale_product set price = $1 where id = $2`
+	query := `update ss.sale_product 
+			  set  shop_id = $1,
+			       product_id = $2,
+			       promotion_id = $3,
+			       price = $4,
+			       currency = $5,
+			       setting_date = $6,
+			       avg_rating = $7
+			  where id = $8`
 
-	result, err := spr.getter.DefaultTrOrDB(ctx, spr.db).ExecContext(ctx, query, saleProduct.Price, saleProduct.ID)
+	result, err := spr.getter.DefaultTrOrDB(ctx, spr.db).ExecContext(ctx, query,
+		saleProduct.ShopID,
+		saleProduct.ProductID,
+		saleProduct.PromotionID,
+		saleProduct.Price,
+		saleProduct.Currency,
+		saleProduct.SettingDate,
+		saleProduct.AvgRating,
+		saleProduct.ID)
 	if err != nil {
 		return err
 	}

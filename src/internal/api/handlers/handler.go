@@ -86,6 +86,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		registered.PUT("/sales/:id", h.updateSaleProductPriceByID)
 		registered.POST("/certificates", h.addCertificate)
 		registered.DELETE("/certificates/:id", h.deleteCertificateByID)
+		registered.PUT("/certificates/:id", h.updateCertificateByID)
 	}
 
 	return router

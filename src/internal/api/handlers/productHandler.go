@@ -116,6 +116,41 @@ func (h *Handler) deleteCertificateByID(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+func (h *Handler) updateCertificateByID(c *gin.Context) {
+	certificateID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var certificateStatusDTO dto.CertificateStatusDTO
+	if err = c.BindJSON(&certificateStatusDTO); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	certificate, err := h.certificateService.GetByID(c.Request.Context(), certificateID)
+	if err != nil && errors.Is(err, errs.ErrCertificateDoesNotExists) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
+		return
+	}
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	certificate.StatusCompliance = certificateStatusDTO.StatusCompliance
+	err = h.certificateService.Update(c.Request.Context(), certificate)
+	if err != nil && errors.Is(err, errs.ErrCertificateDoesNotExists) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
+		return
+	}
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.Status(http.StatusOK)
+}
 func (h *Handler) getRetailerByID(retailerID uuid.UUID) (*models.SupplierModel, error) {
 	retailer, err := h.supplierService.GetRetailerByID(context.Background(), retailerID)
 	if err != nil {

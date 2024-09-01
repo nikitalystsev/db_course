@@ -20,3 +20,7 @@ type CertificateStatisticsDTO struct {
 	CountValidCertificates int       `json:"count_valid_certificates" db:"count_valid_certificates"`
 	TotalCountCertificates int       `json:"total_count_certificates" db:"total_count_certificates"`
 }
+
+type CertificateStatusDTO struct {
+	StatusCompliance bool `json:"status_compliance"`
+}

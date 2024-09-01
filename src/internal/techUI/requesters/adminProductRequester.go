@@ -16,6 +16,7 @@ const adminProductMenu = `Меню обработки товара:
 	2 -- Посмотреть сертификаты соответствия на товар
 	3 -- Добавить сертификат соответствия на товар
 	4 -- Удалить сертификат соответствия на товар
+	5 -- Обновить статус соответствия на товар
 	0 -- Вернуться в главное меню
 `
 
@@ -53,6 +54,10 @@ func (r *Requester) processAdminProductActions(productID uuid.UUID, num int) err
 			}
 		case 4:
 			if err = r.deleteCertificate(productID, num); err != nil {
+				fmt.Printf("\n\n%s\n", err.Error())
+			}
+		case 5:
+			if err = r.updateCertificate(productID, num); err != nil {
 				fmt.Printf("\n\n%s\n", err.Error())
 			}
 		case 0:
@@ -150,6 +155,62 @@ func (r *Requester) deleteCertificate(productID uuid.UUID, num int) error {
 	}
 
 	fmt.Printf("\n\nСертификат был успешно удален!\n")
+
+	return nil
+}
+
+func (r *Requester) updateCertificate(productID uuid.UUID, num int) error {
+	var certificateIDs []uuid.UUID
+	if err := r.cache.Get(certificateKey, &certificateIDs); err != nil {
+		return err
+	}
+
+	var tokens dto.UserTokensDTO
+	if err := r.cache.Get(tokensKey, &tokens); err != nil {
+		return err
+	}
+
+	num, err := input.CertificateCatalogNumber()
+	if err != nil {
+		return err
+	}
+
+	if num > len(certificateIDs)-1 || num < 0 { // num -- это индекс
+		return errors.New("номер сертификата выходит из диапазона выведенных значений")
+	}
+
+	certificateID := certificateIDs[num]
+
+	certificateStatusDTO, err := input.CertificateStatusParam()
+	if err != nil {
+		return err
+	}
+
+	request := HTTPRequest{
+		Method: http.MethodPut,
+		URL:    r.baseURL + fmt.Sprintf("/api/certificates/%s", certificateID.String()),
+		Headers: map[string]string{
+			"Content-Type":  "application/json",
+			"Authorization": fmt.Sprintf("Bearer %s", tokens.AccessToken),
+		},
+		Body:    certificateStatusDTO,
+		Timeout: 10 * time.Second,
+	}
+
+	response, err := SendRequest(request)
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		var info string
+		if err = json.Unmarshal(response.Body, &info); err != nil {
+			return err
+		}
+		return errors.New(info)
+	}
+
+	fmt.Printf("\n\nСтатус сертификата №%d был успешно обновлен!\n", num)
 
 	return nil
 }
