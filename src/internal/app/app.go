@@ -99,6 +99,13 @@ func Run(configDir string) {
 		transactionManager,
 	)
 
+	cacheClient := redis.NewClient(&redis.Options{
+		Addr:     "ss-cache:6379",
+		Username: cfg.Redis.Username,
+		Password: cfg.Redis.Password,
+		DB:       cfg.Redis.DB,
+	})
+
 	handler := handlers.NewHandler(
 		productService,
 		saleProductService,
@@ -109,6 +116,7 @@ func Run(configDir string) {
 		ratingService,
 		certificateService,
 		tokenManager,
+		cacheClient,
 		cfg.Auth.JWT.AccessTokenTTL,
 		cfg.Auth.JWT.RefreshTokenTTL,
 	)

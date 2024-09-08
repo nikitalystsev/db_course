@@ -5,6 +5,7 @@ import (
 	"SmartShopper-services/core/models"
 	"SmartShopper-services/errs"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -19,6 +20,19 @@ func (h *Handler) getProductByID(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
+	}
+
+	var productDTO *dto.ProductDTO
+
+	if h.inUseCache {
+		cacheKey := "product:" + ID.String()
+		cachedProduct, err := h.cache.Get(c.Request.Context(), cacheKey).Result()
+		if err == nil {
+			if err = json.Unmarshal([]byte(cachedProduct), &productDTO); err == nil {
+				c.JSON(http.StatusOK, productDTO)
+				return
+			}
+		}
 	}
 
 	product, err := h.productService.GetByID(c.Request.Context(), ID)
@@ -67,7 +81,7 @@ func (h *Handler) getProductByID(c *gin.Context) {
 		return
 	}
 
-	productDTO := &dto.ProductDTO{
+	productDTO = &dto.ProductDTO{
 		Retailer:              retailer.Title,
 		Distributor:           distributor.Title,
 		Manufacturer:          manufacturer.Title,
@@ -79,6 +93,12 @@ func (h *Handler) getProductByID(c *gin.Context) {
 		NetMass:               product.NetMass,
 		PackageType:           product.PackageType,
 		CertificatesStatistic: stat,
+	}
+
+	if h.inUseCache {
+		cacheKey := "product:" + ID.String()
+		productJSON, _ := json.Marshal(productDTO)
+		h.cache.Set(c.Request.Context(), cacheKey, productJSON, 0)
 	}
 
 	c.JSON(http.StatusOK, productDTO)
@@ -104,6 +124,18 @@ func (h *Handler) getProducts(c *gin.Context) {
 	}
 
 	var products []*models.ProductModel
+
+	if h.inUseCache {
+		cacheKey := fmt.Sprintf("products:limit:%d:offset:%d", limitInt, offsetInt)
+		cachedData, err := h.cache.Get(c.Request.Context(), cacheKey).Result()
+		if err == nil {
+			if err = json.Unmarshal([]byte(cachedData), &products); err == nil {
+				c.JSON(http.StatusOK, products)
+				return
+			}
+		}
+	}
+
 	products, err = h.productService.GetPage(c.Request.Context(), limitInt, offsetInt)
 	if err != nil && errors.Is(err, errs.ErrProductDoesNotExists) {
 		c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
@@ -118,6 +150,12 @@ func (h *Handler) getProducts(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
 		return
+	}
+
+	if h.inUseCache {
+		cacheKey := fmt.Sprintf("products:limit:%d:offset:%d", limitInt, offsetInt)
+		jsonData, _ := json.Marshal(products)
+		h.cache.Set(c.Request.Context(), cacheKey, jsonData, 0)
 	}
 
 	c.JSON(http.StatusOK, productsCertificates)

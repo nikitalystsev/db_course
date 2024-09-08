@@ -4,11 +4,18 @@ WORKDIR /usr/local/src
 
 COPY ["./go.mod", "./go.sum", "./go.work", "./go.work.sum", "./"]
 
+COPY ./internal/repositories/go.mod ./internal/repositories/go.mod
+COPY ./internal/repositories/go.sum ./internal/repositories/go.sum
+COPY ./internal/services/go.mod ./internal/services/go.mod
+COPY ./internal/services/go.sum ./internal/services/go.sum
+COPY ./internal/api/go.mod ./internal/api/go.mod
+COPY ./internal/api/go.sum ./internal/api/go.sum
+
+RUN go mod download
+
 COPY ./internal/repositories ./internal/repositories
 COPY ./internal/services ./internal/services
 COPY ./internal/api ./internal/api
-
-RUN go mod download
 
 COPY ./cmd/app ./cmd/app
 COPY ./internal/app ./internal/app

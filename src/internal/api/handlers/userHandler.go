@@ -5,6 +5,7 @@ import (
 	"SmartShopper-services/core/models"
 	"SmartShopper-services/errs"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
@@ -46,6 +47,8 @@ func (h *Handler) signUp(c *gin.Context) {
 }
 
 func (h *Handler) signIn(c *gin.Context) {
+	fmt.Println("call signIn")
+
 	var inp dto.UserSignInDTO
 	if err := c.BindJSON(&inp); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())

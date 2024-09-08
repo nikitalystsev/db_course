@@ -5,6 +5,7 @@ import (
 	"SmartShopper-services/pkg/auth"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"io"
 	"net/http"
 	"time"
@@ -20,6 +21,8 @@ type Handler struct {
 	ratingService      intf.IRatingService
 	certificateService intf.ICertificateService
 	tokenManager       auth.ITokenManager
+	cache              *redis.Client
+	inUseCache         bool
 	accessTokenTTL     time.Duration
 	refreshTokenTTL    time.Duration
 }
@@ -34,6 +37,7 @@ func NewHandler(
 	ratingService intf.IRatingService,
 	certificateService intf.ICertificateService,
 	tokenManager auth.ITokenManager,
+	cache *redis.Client,
 	accessTokenTTL time.Duration,
 	refreshTokenTTL time.Duration,
 ) *Handler {
@@ -47,6 +51,8 @@ func NewHandler(
 		ratingService:      ratingService,
 		certificateService: certificateService,
 		tokenManager:       tokenManager,
+		cache:              cache,
+		inUseCache:         true,
 		accessTokenTTL:     accessTokenTTL,
 		refreshTokenTTL:    refreshTokenTTL,
 	}

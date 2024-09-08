@@ -5,7 +5,9 @@ import (
 	"SmartShopper-services/core/models"
 	"SmartShopper-services/errs"
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
@@ -24,6 +26,19 @@ func (h *Handler) getSalesByProductID(c *gin.Context) {
 		return
 	}
 
+	var salesDTO []*dto.SaleProductDTO
+
+	if h.inUseCache {
+		cacheKey := "sales:" + productID.String()
+		cachedSales, err := h.cache.Get(c.Request.Context(), cacheKey).Result()
+		if err == nil {
+			if err := json.Unmarshal([]byte(cachedSales), &salesDTO); err == nil {
+				c.JSON(http.StatusOK, salesDTO)
+				return
+			}
+		}
+	}
+
 	sales, err := h.saleProductService.GetByProductID(c.Request.Context(), productID)
 	if err != nil && errors.Is(err, errs.ErrSaleProductDoesNotExists) {
 		c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
@@ -33,10 +48,17 @@ func (h *Handler) getSalesByProductID(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-	salesDTO, err := h.copySalesToDTO(sales)
+
+	salesDTO, err = h.copySalesToDTO(sales)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
 		return
+	}
+
+	if h.inUseCache {
+		cacheKey := "sales:" + productID.String()
+		salesJSON, _ := json.Marshal(salesDTO)
+		h.cache.Set(c.Request.Context(), cacheKey, salesJSON, 0)
 	}
 
 	c.JSON(http.StatusOK, salesDTO)
@@ -55,7 +77,20 @@ func (h *Handler) getCertificatesByProductID(c *gin.Context) {
 		return
 	}
 
-	certificates, err := h.certificateService.GetByProductID(c.Request.Context(), productID)
+	var certificates []*models.CertificateModel
+
+	if h.inUseCache {
+		cacheKey := fmt.Sprintf("certificates:%s", productID)
+		cashedData, err := h.cache.Get(c.Request.Context(), cacheKey).Result()
+		if err == nil {
+			if err = json.Unmarshal([]byte(cashedData), &certificates); err == nil {
+				c.JSON(http.StatusOK, certificates)
+				return
+			}
+		}
+	}
+
+	certificates, err = h.certificateService.GetByProductID(c.Request.Context(), productID)
 	if err != nil && errors.Is(err, errs.ErrCertificateDoesNotExists) {
 		c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
 		return
@@ -64,6 +99,13 @@ func (h *Handler) getCertificatesByProductID(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	if h.inUseCache {
+		cacheKey := fmt.Sprintf("certificates:%s", productID)
+		jsonData, _ := json.Marshal(certificates)
+		h.cache.Set(c.Request.Context(), cacheKey, jsonData, 0)
+	}
+
 	c.JSON(http.StatusOK, certificates)
 }
 

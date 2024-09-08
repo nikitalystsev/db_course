@@ -1,0 +1,3 @@
+Method,Name,Error,Occurrences
+GET,test_requests,HTTPError('500 Server Error: Internal Server Error for url: test_requests'),7932
+GET,test_requests,HTTPError('404 Client Error: Not Found for url: test_requests'),4086
