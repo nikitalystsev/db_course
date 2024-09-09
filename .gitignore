@@ -7,3 +7,4 @@ src/internal/.datasets
 src/.data
 src/internal/data/scripts/__pycache__
 src/ui
+src/research/scripts/__pycache__/

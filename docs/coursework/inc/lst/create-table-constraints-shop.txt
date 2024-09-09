@@ -1,0 +1,11 @@
+alter table if exists ss.shop
+    alter column id set not null,
+    alter column id set default uuid_generate_v4(),
+    alter column retailer_id set not null,
+    add foreign key (retailer_id) references retailer (id) on delete cascade on update cascade,
+    alter column title set not null,
+    alter column address set not null,
+    add unique (address),
+    alter column phone_number set not null,
+    add unique (phone_number),
+    alter column fio_director set not null;

@@ -1,0 +1,6 @@
+create user guest_user with password 'guest';
+create user registered_user with password 'registered';
+create user admin_user with password 'admin';
+grant guest to guest_user;
+grant registered to registered_user;
+grant administrator to admin_user;

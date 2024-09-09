@@ -1,0 +1,8 @@
+create table if not exists ss.retailer
+(
+    id                 uuid primary key,
+    title              text,
+    address            text,
+    phone_number       varchar(30),
+    fio_representative text
+);

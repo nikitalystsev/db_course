@@ -1,0 +1,5 @@
+create or replace trigger recount_sale_product_avg_rating
+    after insert or delete
+    on ss.rating
+    for each row
+execute function ss.recount_sale_product_avg_rating();

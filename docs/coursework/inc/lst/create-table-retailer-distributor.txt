@@ -1,0 +1,6 @@
+create table if not exists ss.retailer_distributor
+(
+    retailer_id    uuid,
+    distributor_id uuid,
+    primary key (retailer_id, distributor_id)
+);

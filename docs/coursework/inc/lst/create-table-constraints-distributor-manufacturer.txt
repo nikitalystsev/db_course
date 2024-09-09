@@ -1,0 +1,5 @@
+alter table ss.distributor_manufacturer
+    alter column distributor_id set not null,
+    add foreign key (distributor_id) references distributor (id) on delete cascade on update cascade,
+    alter column manufacturer_id set not null,
+    add foreign key (manufacturer_id) references manufacturer (id) on delete cascade on update cascade;

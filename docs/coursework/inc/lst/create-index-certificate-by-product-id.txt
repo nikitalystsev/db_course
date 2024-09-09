@@ -1,0 +1,1 @@
+create index idx_product_id on ss.certificate_compliance(product_id);

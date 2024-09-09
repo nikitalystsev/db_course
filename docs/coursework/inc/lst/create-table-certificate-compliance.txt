@@ -1,0 +1,14 @@
+create table if not exists ss.product
+(
+    id              uuid primary key,
+    retailer_id     uuid,
+    distributor_id  uuid,
+    manufacturer_id uuid,
+    name            text,
+    categories      text,
+    brand           text,
+    compound        text,
+    gross_mass      numeric,
+    net_mass        numeric,
+    package_type    text
+);

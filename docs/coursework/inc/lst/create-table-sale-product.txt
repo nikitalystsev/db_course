@@ -1,0 +1,11 @@
+create table if not exists ss.sale_product
+(
+    id           uuid primary key,
+    shop_id      uuid,
+    product_id   uuid,
+    promotion_id uuid,
+    price        numeric,
+    currency     text,
+    setting_date date,
+    avg_rating   float
+);

@@ -1,0 +1,8 @@
+create table if not exists ss.user
+(
+    id                uuid primary key,
+    fio               text,
+    phone_number      varchar(30),
+    password          text,
+    registration_date date
+);

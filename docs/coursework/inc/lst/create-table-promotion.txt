@@ -1,0 +1,9 @@
+create table if not exists ss.promotion
+(
+    id            uuid primary key,
+    type          text,
+    description   text,
+    discount_size numeric,
+    start_date    date,
+    end_date      date
+);

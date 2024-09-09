@@ -1,0 +1,11 @@
+create table if not exists ss.certificate_compliance
+(
+    id                 uuid primary key,
+    product_id         uuid,
+    type               text,
+    number             text,
+    normative_document text,
+    status_compliance  boolean,
+    registration_date  date,
+    expiration_date    date
+);

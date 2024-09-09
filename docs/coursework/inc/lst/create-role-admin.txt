@@ -1,0 +1,3 @@
+create role administrator;
+grant registered to administrator;
+grant all privileges on all tables in schema ss to administrator;

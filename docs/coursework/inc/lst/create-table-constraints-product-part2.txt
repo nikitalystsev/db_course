@@ -1,0 +1,1 @@
+    add check (net_mass <= gross_mass);

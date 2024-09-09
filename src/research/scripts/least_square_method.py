@@ -22,7 +22,8 @@ class LeastSquareMethod:
 
         self._n: int = 0
 
-        self.__read_file()
+        # self.__read_file()
+        self.__read_file_for_index_research()
 
         plt.figure()
 
@@ -44,6 +45,22 @@ class LeastSquareMethod:
         for row in reader:
             self.__arr_x.append(float(row['Requests/s']))
             self.__arr_y.append(float(row['Total Average Response Time']))
+            self._n += 1
+
+        file.close()
+
+    def __read_file_for_index_research(self) -> None:
+        """
+        Метод парсит файл с датасетом
+        """
+        file = open(file=self.__filename, newline='', encoding='utf-8')
+
+        reader = csv.DictReader(file)
+
+        self._n = 0
+        for row in reader:
+            self.__arr_x.append(float(row['x']))
+            self.__arr_y.append(float(row['without_index']))
             self._n += 1
 
         file.close()
@@ -274,8 +291,9 @@ def main() -> None:
     :return:
     """
 
-    LeastSquareMethod('../data/without_cache.csv')
-    LeastSquareMethod('../data/with_cache.csv')
+    # LeastSquareMethod('../data/without_cache.csv')
+    # LeastSquareMethod('../data/with_cache.csv')
+    LeastSquareMethod('../data/index_research1.csv')
 
 
 if __name__ == "__main__":

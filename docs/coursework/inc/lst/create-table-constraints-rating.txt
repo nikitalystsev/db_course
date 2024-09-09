@@ -1,0 +1,10 @@
+alter table ss.rating
+    alter column id set not null,
+    alter column id set default uuid_generate_v4(),
+    alter column user_id set not null,
+    add foreign key (user_id) references "user" (id) on delete cascade on update cascade,
+    alter column sale_product_id set not null,
+    add foreign key (sale_product_id) references sale_product (id) on delete cascade on update cascade,
+    alter column review set not null,
+    alter column rating set not null,
+    add check (rating >= 0 and rating <= 5);

@@ -56,9 +56,6 @@ func Init(configsDir string) (*Config, error) {
 	if err := viper.UnmarshalKey("auth", &cfg.Auth.JWT); err != nil {
 		return nil, err
 	}
-	if err := viper.UnmarshalKey("port", &cfg.Port); err != nil {
-		return nil, err
-	}
 
 	setFromEnv(&cfg)
 
@@ -69,6 +66,7 @@ func setFromEnv(cfg *Config) {
 	if err := godotenv.Load(); err != nil {
 		log.Print("No .env file found")
 	}
+	cfg.Port = os.Getenv("APP_PORT")
 	cfg.Postgres.Host = os.Getenv("POSTGRES_HOST")
 	cfg.Postgres.Port = os.Getenv("POSTGRES_PORT")
 	cfg.Postgres.DBName = os.Getenv("POSTGRES_DB_NAME")

@@ -19,7 +19,7 @@ services:
     image: smartshopper:local
     container_name: ss-app
     ports:
-      - "8000:8000"
+      - "${APP_PORT}:8000"
     depends_on:
       ss-postgres:
         condition: service_healthy

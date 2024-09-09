@@ -1,0 +1,9 @@
+alter table ss.promotion
+    alter column id set not null,
+    alter column id set default uuid_generate_v4(),
+    alter column type set not null,
+    alter column description set not null,
+    alter column start_date set not null,
+    alter column end_date set not null,
+    add check (discount_size > 0 and discount_size < 100),
+    add check (start_date < end_date);

@@ -1,0 +1,14 @@
+alter table ss.sale_product
+    alter column id set not null,
+    alter column id set default uuid_generate_v4(),
+    alter column shop_id set not null,
+    add foreign key (shop_id) references shop (id) on delete cascade on update cascade,
+    alter column product_id set not null,
+    add foreign key (product_id) references product (id) on delete cascade on update cascade,
+    add foreign key (promotion_id) references promotion (id) on delete cascade on update cascade,
+    alter column price set not null,
+    alter column currency set not null,
+    alter column setting_date set not null,
+    add check (avg_rating >= 0 and avg_rating <= 5),
+    add check (price > 0),
+    add unique (shop_id, product_id);

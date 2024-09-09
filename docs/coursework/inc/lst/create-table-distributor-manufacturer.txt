@@ -1,0 +1,6 @@
+create table if not exists ss.distributor_manufacturer
+(
+    distributor_id  uuid,
+    manufacturer_id uuid,
+    primary key (distributor_id, manufacturer_id)
+);

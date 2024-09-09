@@ -1,0 +1,8 @@
+create table if not exists ss.rating
+(
+    id              uuid primary key,
+    user_id         uuid,
+    sale_product_id uuid,
+    review          text,
+    rating          numeric
+);
