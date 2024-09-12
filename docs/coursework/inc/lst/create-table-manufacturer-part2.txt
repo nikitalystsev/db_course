@@ -1,2 +1,0 @@
-    fio_representative text
-);
