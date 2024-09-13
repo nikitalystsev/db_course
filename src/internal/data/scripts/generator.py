@@ -469,7 +469,7 @@ class Generator:
                     "product_id": product_id,
                     "promotion_id": self.__get_random_promotion_id(),
                     "price": round(random.uniform(100, 5000), 2),
-                    "currency": self.faker.currency_code(),
+                    "currency": "РУБ",
                     "setting_date": self.__get_random_date_in_past(),
                     "avg_rating": None,
                 })

@@ -52,7 +52,7 @@ func NewHandler(
 		certificateService: certificateService,
 		tokenManager:       tokenManager,
 		cache:              cache,
-		inUseCache:         true,
+		inUseCache:         false,
 		accessTokenTTL:     accessTokenTTL,
 		refreshTokenTTL:    refreshTokenTTL,
 	}

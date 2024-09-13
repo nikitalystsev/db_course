@@ -282,6 +282,7 @@ func (h *Handler) copySaleToDTO(sale *models.SaleProductModel) (*dto.SaleProduct
 
 	saleProduct.Price = sale.Price
 	saleProduct.Currency = sale.Currency
+	fmt.Println(saleProduct.Currency)
 	saleProduct.SettingDate = sale.SettingDate
 	saleProduct.AvgRating = sale.AvgRating
 
